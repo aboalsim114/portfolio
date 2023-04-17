@@ -32,7 +32,8 @@ export default function Login() {
             
               
               localStorage.setItem("token", res.data.token);
-             
+              localStorage.setItem("userid", userId);
+
               console.log(data);
               history(`/Dashboard/${userId}`);
 

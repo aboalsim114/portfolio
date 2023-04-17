@@ -10,7 +10,8 @@ const articleSchema = new mongoose.Schema({
 
     content: {
         type: String,
-        required: true
+        required: true,
+
     },
 
 
@@ -19,10 +20,7 @@ const articleSchema = new mongoose.Schema({
         default: Date.now
     },
 
-    image: {
-        type: String,
-        required: true
-    }
+
 
 
 

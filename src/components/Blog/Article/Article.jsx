@@ -25,6 +25,9 @@ export default function Article() {
 
     return (
         <>
+    <div className="retour">
+    <Link  className='btnBack' to="/blog"><i class="fa-regular fa-circle-left fa-2xl"></i></Link>
+    </div>
             <div className="container pb50">
                 <div className="row">
                     <div className="col-md-9 mb40">
