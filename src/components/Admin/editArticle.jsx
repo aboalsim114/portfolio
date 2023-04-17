@@ -5,7 +5,7 @@ import MarkdownIt from 'markdown-it'
 import MdEditor from 'react-markdown-editor-lite'
 import 'react-markdown-editor-lite/lib/index.css'
 import './Dashboard.css';
-
+import Nav from './Nav';
 export default function EditArticle() {
   const { userid } = useParams();
 
@@ -83,17 +83,19 @@ export default function EditArticle() {
 
 
   return (
+    <>
+    <Nav/>
     <div className='container mt-4'>
       <form onSubmit={handleSubmit}>
         <div className='form-group'>
-          <label htmlFor='titre'>Titre:</label>
+          <label  htmlFor='titre'>Titre:</label>
           <input
             type='text'
             id='titre'
             className='form-control'
             value={titre}
             onChange={handleTitreChange}
-          />
+            />
         </div>
     
   
@@ -104,7 +106,7 @@ export default function EditArticle() {
                                     renderHTML={(text) => mdParser.render(text)}
                                     onChange={({text}) => setContent(text)}
                                     style={{height: '400px', width : "800px"}}
-                                />
+                                    />
                             </div>
 
         <div className="form-group">
@@ -119,5 +121,6 @@ export default function EditArticle() {
 
       </form>
     </div>
+     </>
   );
 }
