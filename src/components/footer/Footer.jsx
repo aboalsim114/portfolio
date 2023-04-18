@@ -17,9 +17,9 @@ const Footer = () => {
     <footer>
       <a href="#home" className="footer__logo">ABDULHALIM SAMI</a>
       <ul className="permalinks">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#experience">Skills</a></li>
+        <li><a href="#home">accueil</a></li>
+        <li><a href="#about">À propos</a></li>
+        <li><a href="#experience">Compétences</a></li>
         <li><Link to="/blog">Blog</Link> </li>
         
         <li><a href="#contact">Contact</a></li>
