@@ -63,7 +63,7 @@ const Contact = () => {
             name="message"
             required
           ></textarea>
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn-G text-white ">
           Envoyer le message
           </button>
           {message && <span>Merci, je répondrai au plus vite :)</span>}

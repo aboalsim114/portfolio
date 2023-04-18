@@ -29,7 +29,7 @@ const Intro = () => {
             </article>
           </div>
           <p>Je m'appelle Sami, j'ai 22 ans et je suis actuellement en Bachelor Développement Web & Mobile a l'ecole ECE Paris pour devenir développeur web full-stack. Après celle-ci je souhaiterais poursuivre sur un master pour élargir mes compétences dans le domaine du web. J'aime toucher à tout et être autonome sur les projets que l'on me confie, cependant j'apporte une affection supplémentaire au développement dit back-end, notamment avec PHP.</p>
-          <a href="#contact" className="btn btn-primary">Parlons</a>
+          <a href="#contact" className="btn-G">Parlons</a>
         </div>
       </div>
     </section>

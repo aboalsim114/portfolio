@@ -17,36 +17,41 @@ export default function AddArticle() {
     const handleSubmit = (e) => {
         e.preventDefault()
 
+     
+
         const data = {
-            titre: titre,
+            titre: titre  ,
             content: content
         };
 
         let url = "http://localhost:3001/api/Dashboard/addArticle";
 
-        axios.post(url,data)
-        .then(res => {
-
-            if(res.data.savedArticle)
-            {
-                setSuccessMsg("votre article a été publié ")
-            }
-            console.log(res);
-
-
-        })
-        .catch((err) => {
-            setErrorMsg(err.response.data.message)
-
-        });
-
-
+       
+            
+            axios.post(url,data)
+            .then(res => {
+                
+                if(res.data.savedArticle)
+                {
+                    setSuccessMsg("votre article a été publié ")
+                }
+                console.log(res);
+                
+                
+            })
+            .catch((err) => {
+                setErrorMsg(err.response.data.message)
+                
+            });
+        
+            
+            
     }
 
     return (
         <>
             <Nav/>
-            <div className="container">
+            <div className="container AddArticle">
                 <div className="row">
 
                     <div className="col-md-8 col-md-offset-2">
@@ -80,10 +85,14 @@ export default function AddArticle() {
                                 <p style={{color:  "green"}}>{successMsg ? successMsg : null}</p>
                             </div>
 
+                            <button className='btn-Publier' type="submit">
+                            <span>
+                            Créer un article
+                            </span>
+                        </button>
 
-
-                            <input type="submit"  value="publier" />
-
+{/*                             <input type="submit" className='btn-Publier'  value="publier" />
+ */}
 
 
                         </form>

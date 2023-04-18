@@ -50,7 +50,7 @@ export default function Login() {
 
 
   return (
-    <div className="container bootstrap snippets bootdey">
+    <div className="container mt-4">
       <div className="row">
         <div className="col-sm-6 col-md-4 col-md-offset-4">
         
@@ -59,7 +59,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} method='POST' className="form-signin">
               <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value) } placeholder="Email" required />
               
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" placeholder="Password" required />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" placeholder="**********" required />
                
               
               <input  className="btn btn-lg btn-primary btn-block" type="submit" value="Connexion" />

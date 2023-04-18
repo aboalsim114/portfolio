@@ -22,12 +22,15 @@ export default function Blog() {
           });
       }, []);
 
+      const formattedDate = data.createdAt ? new Date(data.createdAt).toLocaleDateString("fr-FR") : '';
+
+
   return (
       <>
     <div className="retour">
     <Link  className='btnBack' to="/"><i class="fa-regular fa-circle-left fa-2xl"></i></Link>
     </div>
-    <div id="main-content" class="blog-page">
+    <div id="main-content " class="blog-page">
     <div class="container mt-4">
         <div class="row clearfix">
             <div class="col-lg-8 col-md-12 left-box">
@@ -36,18 +39,31 @@ export default function Blog() {
 
                 
     {data.map((article) => (
-  <div className="card single_post" key={article._id}>
-    <div className="body">
-      <div className="img-post">
-      </div>
-      <h3><a href={`article/${article._id}`}>{article.titre}</a></h3>
-    </div>
-    <div className="footer">
-      <div className="actions">
-        <a href={`article/${article._id}`} className="btn btn-outline-secondary">Continue Reading</a>
-      </div>
-    </div>
+      <div class="card" key={article._id}>
+  <div class="date-time-container">
+    <time class="date-time" datetime={formattedDate}>
+      <span>{data.createdAt ? new Date(data.createdAt).toLocaleDateString("fr-FR") : ''} </span>
+      <span class="separator"></span>
+    </time>
   </div>
+  <div class="content">
+  
+    <div class="infos">
+      <a href={`article/${article._id}`}>
+        <span class="title">
+         {article.titre}
+        </span>
+      </a>
+
+      <p class="description">
+      {article.content.length <= 200 ? article.content : article.content.slice(0, 400) + '  ....'}
+      </p>
+    </div>
+
+    <a href={`article/${article._id}`} className="action">voir plus</a>
+
+  </div>
+</div>
 ))}
 
 
