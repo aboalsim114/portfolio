@@ -65,3 +65,9 @@
 				                  display: block;
 				                  margin-top: 10px;
 				              }
+				              
+				              .account-wall {
+				                  width: 60rem;
+				                  height: auto;
+				                  margin: 3% auto;
+				              }
