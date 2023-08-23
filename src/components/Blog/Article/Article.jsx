@@ -7,21 +7,24 @@ import ReactMarkdown from 'react-markdown';
 export default function Article() {
 
     const [data,setData] = useState([])
-    const {userid} = useParams();
+    const {article_id} = useParams();
+    const admin = localStorage.getItem("admin");
+
     useEffect(() => {
-        let url = `http://localhost:3001/api/Dashboard/article/${userid}`;
+        let url = `http://localhost:8000/api/${article_id}/`;
         axios.get(url)
           .then((res) => {
-            if (res.data.article) {
-              setData(res.data.article);
+            if (res.data) {
+              setData(res.data);
+              console.log(res);
             }
           })
           .catch((err) => {
             console.log(err);
           });
-      }, []);
+      }, [article_id]);
       
-      const formattedDate = data.createdAt ? new Date(data.createdAt).toLocaleDateString("fr-FR") : '';
+      const formattedDate = data.created_at ? new Date(data.created_at).toLocaleDateString("fr-FR") : '';
 
     return (
         <>
@@ -33,7 +36,8 @@ export default function Article() {
                     <div className="col-md-9 mb40">
                         <article>
                             <div className="post-content">
-                                <h3>{data.titre}</h3>
+                                <h3> {data.title}</h3>
+                                <img src={data.image} alt="Description de l'image" />
                                 <ul className="post-meta list-inline">
                                     <li className="list-inline-item">
                                         <i className="fa fa-user-circle-o"></i> <a href="">Abdulhalim sami</a>
@@ -45,6 +49,9 @@ export default function Article() {
 
                                     <li className="list-inline-item">
                                         <i className="fa fa-code"></i> <a href="">Developpeur full stack</a>
+                                    </li>
+                                    <li className="list-inline-item">
+                                    {!admin && <span> <Link to={`/editArticle/${article_id}`}>Modifier l'article</Link></span>}
                                     </li>
                                 </ul>
                                 { data.content && <ReactMarkdown children={data.content} />  }

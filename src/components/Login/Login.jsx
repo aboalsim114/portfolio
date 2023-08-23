@@ -20,33 +20,30 @@ export default function Login() {
         email: email,
         password: password,
       };
+    
+      if (email === "sami.abdulhalim.pro@gmail.com" && password === "Sami@2000") {
       
-      let url = "http://localhost:3001/api/Account/login";
-      await axios.post(url, data)
-        .then((res) => {
-          if (res.data.token) {
-            const decodedToken = jwt.decode(res.data.token);
-            const userId = decodedToken.userId; // Retrieve the user ID from the decoded token
-            const email = decodedToken.email;
-           
-            
-              
-              localStorage.setItem("token", res.data.token);
-              localStorage.setItem("userid", userId);
-
-              console.log(data);
-              history(`/Dashboard/${userId}`);
-
-          } else if (res.data === "Invalid password") {
-            setEerrorMsg(res.data);
-          } else if (res.data === "Invalid email") {
-            setEerrorMsg(res.data);
-          }
-        })
-        .catch((err) => {
-          setEerrorMsg(err.response.data.message);
-        });
+        const secretKey = "abdulhalimSami2000@@"; 
+    
+      
+        const payload = {
+          email: email,
+          userid: 100, 
+        };
+    
+        
+        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' }); 
+    
+        localStorage.setItem("token", token);
+        localStorage.setItem("userid", payload.userid);
+    
+        console.log(data);
+        history(`/Dashboard/${payload.userid}`);
+      } else {
+        setEerrorMsg("Invalid email or password");
+      }
     };
+    
 
 
   return (

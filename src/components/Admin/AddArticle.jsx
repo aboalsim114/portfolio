@@ -13,25 +13,24 @@ export default function AddArticle() {
     const [successMsg,setSuccessMsg] = useState("")
 
     const mdParser = new MarkdownIt(/* Markdown-it options */);
-
     const handleSubmit = (e) => {
         e.preventDefault()
 
-     
+        
 
         const data = {
-            titre: titre  ,
+            title: titre  ,
             content: content
         };
 
-        let url = "http://localhost:3001/api/Dashboard/addArticle";
+        let url = "http://localhost:8000/api/";
 
        
             
             axios.post(url,data)
             .then(res => {
                 
-                if(res.data.savedArticle)
+                if(res.data)
                 {
                     setSuccessMsg("votre article a été publié ")
                 }
@@ -50,7 +49,7 @@ export default function AddArticle() {
 
     return (
         <>
-            <Nav/>
+          
             <div className="container AddArticle">
                 <div className="row">
 

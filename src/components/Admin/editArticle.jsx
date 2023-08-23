@@ -7,17 +7,17 @@ import 'react-markdown-editor-lite/lib/index.css'
 import './Dashboard.css';
 import Nav from './Nav';
 export default function EditArticle() {
-  const { userid } = useParams();
+  const { article_id } = useParams();
 
-  const [titre, setTitre] = useState('');
+  const [title, settitle] = useState('');
   const [content, setContent] = useState('');
   const [successMsg,setSuccessMsg] = useState("")
   const [errorMsg,setErrormsg] = useState("")
-        const [data,setData] = useState([])
-        const mdParser = new MarkdownIt(/* Markdown-it options */);
+  const [data,setData] = useState([])
+  const mdParser = new MarkdownIt(/* Markdown-it options */);
 
-  const handleTitreChange = (event) => {
-    setTitre(event.target.value);
+  const handletitleChange = (event) => {
+    settitle(event.target.value);
   };
 
   const handleContentChange = (event) => {
@@ -27,34 +27,33 @@ export default function EditArticle() {
 
 
   useEffect(() => {
-    let url = `http://localhost:3001/api/Dashboard/article/${userid}`;
-    axios.get(url)
-      .then((res) => {
-        if (res.data.article) {
-          setTitre(res.data.article.titre)
-          setContent(res.data.article.content)
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    const fetData = async () => {
+      let url = `http://localhost:8000/api/${article_id}/`;
+      const res = await axios.get(url);
+      const result = res.data;
+      setData(result)
+      settitle(result.title);
+  setContent(result.content);
+
+    }
+    fetData();
+  }, [article_id]);
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    let url = `http://localhost:3001/api/Dashboard/editArticle/${userid}`;
+    let url = `http://localhost:8000/api/${article_id}/`;
 
     const data = {
-        titre : titre,
+        title : title,
         content : content
     }
     
 
     axios.patch(url,data)
     .then(res => {
-        if(res.data.updatedArticle)
+        if(res.data)
         {
             setSuccessMsg("l'article est mise a jour");
         }
@@ -84,17 +83,17 @@ export default function EditArticle() {
 
   return (
     <>
-    <Nav/>
+
     <div className='container mt-4'>
       <form onSubmit={handleSubmit}>
         <div className='form-group'>
-          <label  htmlFor='titre'>Titre:</label>
+          <label  htmlFor='title'>title:</label>
           <input
             type='text'
-            id='titre'
+            id='title'
             className='form-control'
-            value={titre}
-            onChange={handleTitreChange}
+            value={title}
+            onChange={handletitleChange}
             />
         </div>
     
