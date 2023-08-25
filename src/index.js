@@ -22,10 +22,10 @@ root.render(
       <Route path="/connexion" element={<Login/>} />
       <Route path='*' exact={true} element={<NotFound/>} />
       <Route path='/article/:article_id'  element={<Article/>} />
-      <Route path="/editArticle/:article_id" element={<EditArticle />} />
-      <Route path="/AddArticle/:userid" element={<AddArticle />}  />
-      <Route path="/Dashboard/:userid" element={<Dashboard />}  />
       <Route element={<PrivateRoute/>}>
+      <Route path="/editArticle/:article_id" element={<EditArticle />} />
+      <Route path="/AddArticle/" element={<AddArticle />}  />
+      <Route path="/Dashboard/:userid" element={<Dashboard />}  />
       </Route>
 
       </Routes>

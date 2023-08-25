@@ -20,29 +20,20 @@ export default function Login() {
         email: email,
         password: password,
       };
-    
-      if (email === "sami.abdulhalim.pro@gmail.com" && password === "Sami@2000") {
-      
-        const secretKey = "abdulhalimSami2000@@"; 
-    
-      
-        const payload = {
-          email: email,
-          userid: 100, 
-        };
-    
-        
-        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' }); 
-    
-        localStorage.setItem("token", token);
-        localStorage.setItem("userid", payload.userid);
-    
-        console.log(data);
-        history(`/Dashboard/${payload.userid}`);
-      } else {
-        setEerrorMsg("Invalid email or password");
+      let url = "http://localhost:8000/api/users/";
+      try {
+        const response = await axios.post(url, data);
+        if (response.data && response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          setSuccessMsg("Login successful!");
+          navigate('/dashboard'); // Redirect to dashboard or home page
+        } else {
+          setEerrorMsg("Invalid login credentials.");
+        }
+      } catch (error) {
+        setEerrorMsg(error.response.data.message || "An error occurred.");
       }
-    };
+    };a
     
 
 

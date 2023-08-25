@@ -8,10 +8,10 @@ export default function Article() {
 
     const [data,setData] = useState([])
     const {article_id} = useParams();
-    const admin = localStorage.getItem("admin");
+    const admin = localStorage.getItem("authToken");
 
     useEffect(() => {
-        let url = `http://localhost:8000/api/${article_id}/`;
+        let url = `http://localhost:8000/api/articles/${article_id}/`;
         axios.get(url)
           .then((res) => {
             if (res.data) {
@@ -51,7 +51,7 @@ export default function Article() {
                                         <i className="fa fa-code"></i> <a href="">Developpeur full stack</a>
                                     </li>
                                     <li className="list-inline-item">
-                                    {!admin && <span> <Link to={`/editArticle/${article_id}`}>Modifier l'article</Link></span>}
+                                    {admin && <span> <Link to={`/editArticle/${article_id}`}>Modifier l'article</Link></span>}
                                     </li>
                                 </ul>
                                 { data.content && <ReactMarkdown children={data.content} />  }

@@ -1,8 +1,20 @@
-import { Outlet, Navigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { Outlet, Navigate } from 'react-router-dom';
 
-const PrivateRoutes = () => {
-  const auth = localStorage.getItem("token");
+const PrivateRoute = ({ children }) => {
+  const [auth, setAuth] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    setAuth(!!token);
+  }, []);
+
+  if (auth === null) {
+    return null;
+  }
+
   return auth ? <Outlet /> : <Navigate to="/connexion" />;
 };
 
-export default PrivateRoutes;
+export default PrivateRoute;

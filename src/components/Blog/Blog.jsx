@@ -8,7 +8,7 @@ export default function Blog() {
     const admin = localStorage.getItem("admin");
 
     useEffect(() => {
-        let url = "http://localhost:8000/api/";
+        let url = "http://localhost:8000/api/articles/";
         axios.get(url)
             .then((res) => {
                 if (res.data) {

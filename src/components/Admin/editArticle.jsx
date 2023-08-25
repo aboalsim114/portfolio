@@ -28,7 +28,7 @@ export default function EditArticle() {
 
   useEffect(() => {
     const fetData = async () => {
-      let url = `http://localhost:8000/api/${article_id}/`;
+      let url = `http://localhost:8000/api/articles/${article_id}/`;
       const res = await axios.get(url);
       const result = res.data;
       setData(result)
@@ -43,7 +43,7 @@ export default function EditArticle() {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    let url = `http://localhost:8000/api/${article_id}/`;
+    let url = `http://localhost:8000/api/articles/${article_id}/`;
 
     const data = {
         title : title,

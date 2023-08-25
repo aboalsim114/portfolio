@@ -11,41 +11,29 @@ export default function AddArticle() {
     const [content,setContent] = useState("")
     const [errorMsg,setErrorMsg] = useState("")
     const [successMsg,setSuccessMsg] = useState("")
-
+    const [image, setImage] = useState(null);
     const mdParser = new MarkdownIt(/* Markdown-it options */);
     const handleSubmit = (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
-        
+        const formData = new FormData();
+        formData.append('title', titre);
+        formData.append('content', content);
+        formData.append('image', image);
 
-        const data = {
-            title: titre  ,
-            content: content
-        };
+        let url = 'http://localhost:8000/api/articles/';
 
-        let url = "http://localhost:8000/api/";
-
-       
-            
-            axios.post(url,data)
-            .then(res => {
-                
-                if(res.data)
-                {
-                    setSuccessMsg("votre article a été publié ")
+        axios
+            .post(url, formData)
+            .then((res) => {
+                if (res.data) {
+                    setSuccessMsg('Votre article a été publié');
                 }
-                console.log(res);
-                
-                
             })
             .catch((err) => {
-                setErrorMsg(err.response.data.message)
-                
+                setErrorMsg(err.response.data.message);
             });
-        
-            
-            
-    }
+    };
 
     return (
         <>
@@ -68,6 +56,10 @@ export default function AddArticle() {
                             </div>
 
                             <div className="form-group">
+                                <input type="file" name="image" id="image" onChange={(e) => setImage(e.target.files[0])} />
+                            </div>
+
+                            <div className="form-group">
                                 <label htmlFor="description">Description</label>
                                 <MdEditor
                                     value={content}
@@ -76,6 +68,8 @@ export default function AddArticle() {
                                     style={{height: '400px', width : "800px"}}
                                 />
                             </div>
+
+                            
 
                             <div className="form-group">
                                 <p style={{color: errorMsg ? "red" : "green"}}>{errorMsg ? errorMsg : null}</p>
