@@ -2,6 +2,7 @@
     color: #000000;
     overflow-x: hidden;
     box-sizing: border-box;
+    color: #fff;
 }
 
 .flex {
@@ -30,7 +31,6 @@
     box-shadow: none;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
-    -ms-box-shadow: none
 }
 
 .pl-3,
@@ -42,6 +42,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    color: #222;
     word-wrap: break-word;
     background-color: #fff;
     background-clip: border-box;

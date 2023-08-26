@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import "./Blog.css";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
 export default function Blog() {
     const [Data, setData] = useState([]);
     const admin = localStorage.getItem("admin");
@@ -20,8 +19,11 @@ export default function Blog() {
             });
     }, []);
       
+    
     return (
+        
         <>
+        
             <div className="retour">
                 <Link className='btnBack' to="/"><i className="fa-regular fa-circle-left fa-2xl"></i></Link>
             </div>
@@ -59,6 +61,8 @@ export default function Blog() {
                     </div>
                 </div>
             </div>
+           
+
         </>
     )
 }

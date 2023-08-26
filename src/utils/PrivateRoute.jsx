@@ -5,7 +5,7 @@ const PrivateRoute = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
 
     setAuth(!!token);
   }, []);

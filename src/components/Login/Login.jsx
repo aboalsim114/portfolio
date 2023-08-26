@@ -6,34 +6,51 @@ import jwt from "jsonwebtoken"; // Add this line
 
 export default function Login() {
 
-  const history = useNavigate()
+  const navigate = useNavigate()
 
-    const [email,setEmail] = useState("");
+    const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [errorMsg , setEerrorMsg] = useState([])
     const [successMsg , setSuccessMsg] = useState([])
+    const [loading , setLoading] = useState(false);
+
+    
 
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setLoading(true);
       const data = {
-        email: email,
+        username: username,
         password: password,
       };
-      let url = "http://localhost:8000/api/users/";
+      let url = "http://localhost:8000/api/users/login/";
       try {
         const response = await axios.post(url, data);
-        if (response.data && response.data.token) {
+        if (response.status === 200 && response.data && response.data.token) {
           localStorage.setItem('token', response.data.token);
+          localStorage.setItem('username', response.data.user.username);
+          localStorage.setItem('userid', response.data.user.id);
+          localStorage.setItem('isAdmin', response.data.user.is_superuser);
+          localStorage.setItem("derniere_connexion", response.data.user.last_login)
           setSuccessMsg("Login successful!");
-          navigate('/dashboard'); // Redirect to dashboard or home page
+          if(response.data.user.is_superuser)
+          {
+            navigate(`/Dashboard/${response.data.user.id}`);
+            
+          }
+          else{
+            navigate("/blog");
+          }
         } else {
           setEerrorMsg("Invalid login credentials.");
         }
       } catch (error) {
         setEerrorMsg(error.response.data.message || "An error occurred.");
+      } finally {
+        setLoading(false);
       }
-    };a
+    }
     
 
 
@@ -45,7 +62,7 @@ export default function Login() {
           <div className="account-wall">
             <img className="profile-img" src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Profile" />
             <form onSubmit={handleSubmit} method='POST' className="form-signin">
-              <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value) } placeholder="Email" required />
+              <input type="text" className="form-control" value={username} onChange={(e) => setUsername(e.target.value) } placeholder="username" required />
               
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" placeholder="**********" required />
                

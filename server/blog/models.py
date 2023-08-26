@@ -13,16 +13,9 @@ class Article(models.Model):
     def __str__(self) :
         return self.title
 
-class Commentaires(models.Model):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments',)
-    comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        ordering = ['-created_at']
+""" --------------------------------------------------------------------- """
 
-    def __str__(self):
-        return self.comment
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -45,6 +38,9 @@ class UserManager(BaseUserManager):
 
         return self.create_user(username, email, password, **extra_fields)
 
+""" --------------------------------------------------------------------- """
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=255, unique=True)
@@ -65,3 +61,33 @@ class User(AbstractBaseUser, PermissionsMixin):
     @classmethod
     def get_by_natural_key(cls, username):
         return cls.objects.get(username=username)
+
+
+
+""" --------------------------------------------------------------------- """
+
+
+class Commentaires(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments',)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments', null=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.comment
+    
+
+""" --------------------------------------------------------------------- """
+
+
+class Likes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes', null=True)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='likes', null=True)
+
+    def __str__(self) :
+        return self.user.username
+    
+    

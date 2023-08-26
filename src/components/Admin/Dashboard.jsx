@@ -4,14 +4,17 @@ import "./Dashboard.css"
 import Nav from "./Nav"
 import { BiTrash } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
+import { GrArticle } from "react-icons/gr";
+import { BiWorld } from "react-icons/bi";
+import { RiAddFill } from "react-icons/ri";
 import axios from 'axios';
 
 export default function Dashboard() {
     const {userid} = useParams();
     const [data,setData] = useState([])
-
+    const [article_id,setArticle_id] = useState("")
     useEffect(() => {
-      let url = "http://localhost:8000/api/";
+      let url = "http://localhost:8000/api/articles/";
       axios.get(url)
         .then((res) => {
           if (res.data) {
@@ -23,18 +26,9 @@ export default function Dashboard() {
         });
     }, [userid]);
 
-    const handleDelete = (id) => {
-      let url = `http://localhost:3001/api/Dashboard/deleteArticle/${id}`;
-      axios.delete(url)
-        .then(res => {
-          if (res.data.deletedArticle) {
-            setData(prevData => prevData.filter(article => article._id !== id));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+
+    
+
 
 
     return (
@@ -50,6 +44,7 @@ export default function Dashboard() {
                       <p class="card-description">
                         blog cards 
                       </p>
+                      <span ><Link style={{cursor: "pointer",fontSize : "20px"}} to={`/addArticle/`} className="badge badge-info"><RiAddFill/> </Link></span>
                       <div class="table-responsive">
                         <table class="table">
                           <thead>
@@ -58,6 +53,7 @@ export default function Dashboard() {
                               <th>Tittre</th>
                               <th>Actions</th>
                               <th>Date</th>
+                              <th>voir l'article</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -68,10 +64,14 @@ export default function Dashboard() {
                                 <td>{article.id}</td>
                                 <td>{article.title}</td>
                                 <td>
-                                  <button onClick={() => handleDelete(article._id)} class="badge badge-danger" style={{marginRight : "10px"}} ><BiTrash/></button>
-                                  <Link to={`/editArticle/${article.id}`} class="badge badge-success"><BiEdit/></Link>
+                                  <button  className="badge badge-danger" style={{marginRight : "10px"}} ><BiTrash/></button>
+                                  <Link to={`/editArticle/${article.id}`} className="badge badge-success"><BiEdit/></Link>
                                 </td>
                                 <td>{formattedDate}</td>
+                                <td>
+                                <Link to={`/article/${article.id}`} className="badge badge-primary"><BiWorld/></Link>
+
+                                </td>
                               </tr>
                               )
                             }
@@ -83,6 +83,8 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
+
+                  
                 </div>
               </div>
             </div>
