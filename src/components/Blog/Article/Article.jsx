@@ -9,7 +9,7 @@ export default function Article() {
     const [data,setData] = useState([])
     const [newComment,setNewComment] = useState([])
     const {article_id} = useParams();
-    const admin = localStorage.getItem("token");
+    const admin = localStorage.getItem("isAdmin");
 
 
     

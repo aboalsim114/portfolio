@@ -109,14 +109,14 @@
     position: static;
 }
 
-.form-group input,
-.form-group textarea {
+.Commentaire .form-group input,
+.Commentaire .form-group textarea {
     background-color: black;
     border: 1px solid rgba(16, 46, 46, 1);
     border-radius: 12px;
 }
 
-form {
+.Commentaire form {
     border: 1px solid rgba(16, 46, 46, 1);
     background-color: rgba(16, 46, 46, 0.973);
     border-radius: 5px;

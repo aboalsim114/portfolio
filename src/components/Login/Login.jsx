@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import './Login.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import axios from 'axios';
 import jwt from "jsonwebtoken"; // Add this line
 
@@ -14,7 +14,15 @@ export default function Login() {
     const [successMsg , setSuccessMsg] = useState([])
     const [loading , setLoading] = useState(false);
 
-    
+    const setCookie = (name, value, days) => {
+      let expires = "";
+      if (days) {
+          const date = new Date();
+          date.setTime(date.getTime() + (days*24*60*60*1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
 
 
     const handleSubmit = async (e) => {
@@ -73,6 +81,7 @@ export default function Login() {
               <span className="clearfix">
 
               <p style={{color: "red"}}> {errorMsg} </p>
+              <p style={{textAlign: "center"}}> Vous n'avez pas encore de compte ? <Link to="/inscription">S'inscrire</Link> </p>
 
               </span>
             </form>

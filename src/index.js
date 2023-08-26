@@ -11,6 +11,7 @@ import NotFound from "./components/NotFound/notFound"
 import AddArticle from './components/Admin/AddArticle';
 import Article from './components/Blog/Article/Article';
 import EditArticle from './components/Admin/editArticle';
+import Inscription from './components/Inscription/Inscription';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -20,6 +21,7 @@ root.render(
       <Route path="/" element={<App/>} />
       <Route path="/blog" element={<Blog/>} />
       <Route path="/connexion" element={<Login/>} />
+      <Route path="/inscription" element={<Inscription/>} />
       <Route path='*' exact={true} element={<NotFound/>} />
       <Route path='/article/:article_id'  element={<Article/>} />
       <Route element={<PrivateRoute/>}>
