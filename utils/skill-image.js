@@ -76,6 +76,7 @@ import LinuxLOGO from '/public/svg/skills/linux.svg';
 import ReduxLOGO from '/public/svg/skills/redux.svg';
 import ReactNativeLOGO from '/public/svg/skills/react-native-1.svg';
 import ExpressLOGO from '/public/svg/skills/express.svg';
+import NodejsLOGO from '/public/svg/skills/nodejs.svg';
 export const skillsImage = (skill) => {
   const skillID = skill.toLowerCase();
   switch (skillID) {  
@@ -235,6 +236,8 @@ export const skillsImage = (skill) => {
       return ReactNativeLOGO;
     case 'express':
       return ExpressLOGO;
+    case 'nodejs':
+      return NodejsLOGO;
     default:
       break;
   }
