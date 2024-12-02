@@ -9,6 +9,8 @@ import { personalData } from "@/utils/data/personal-data";
 import Image from 'next/image';
 import { VscClearAll } from 'react-icons/vsc';
 import { BiReset } from 'react-icons/bi';
+import { MdColorLens, MdStyle } from 'react-icons/md';
+import { IoColorPaletteOutline } from 'react-icons/io5';
 
 const CHAT_HISTORY_KEY = 'chat_history';
 const SESSION_ID_KEY = 'chat_session_id';
@@ -22,6 +24,8 @@ function Chatbot() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [currentTheme, setCurrentTheme] = useState('default');
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
 
   const socialLinks = [
     {
@@ -38,6 +42,68 @@ function Chatbot() {
 
   const recognitionRef = useRef(null);
   const synthRef = useRef(null);
+
+  // Définition des thèmes
+  const themes = {
+    default: {
+      name: 'Défaut',
+      gradient: 'from-pink-500 to-violet-600',
+      border: 'border-violet-500/20',
+      bg: 'bg-[#0d1224]',
+      messageBg: 'bg-[#1b2c68a0]',
+      accent: 'violet',
+    },
+    ocean: {
+      name: 'Océan',
+      gradient: 'from-blue-500 to-cyan-500',
+      border: 'border-blue-500/20',
+      bg: 'bg-[#0a192f]',
+      messageBg: 'bg-[#172a46]',
+      accent: 'blue',
+    },
+    forest: {
+      name: 'Forêt',
+      gradient: 'from-green-500 to-emerald-600',
+      border: 'border-green-500/20',
+      bg: 'bg-[#0f1922]',
+      messageBg: 'bg-[#1a2830]',
+      accent: 'green',
+    },
+    sunset: {
+      name: 'Coucher de soleil',
+      gradient: 'from-orange-500 to-red-600',
+      border: 'border-orange-500/20',
+      bg: 'bg-[#1a1216]',
+      messageBg: 'bg-[#2a1e22]',
+      accent: 'orange',
+    }
+  };
+
+  // Sélecteur de thème
+  const ThemeSelector = () => (
+    <div className="absolute right-0 top-12 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-700 z-50">
+      <div className="space-y-2">
+        {Object.entries(themes).map(([key, theme]) => (
+          <button
+            key={key}
+            onClick={() => {
+              setCurrentTheme(key);
+              setShowThemeMenu(false);
+              localStorage.setItem('chatbot-theme', key);
+            }}
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              currentTheme === key 
+                ? `bg-gradient-to-r ${theme.gradient} text-white`
+                : 'hover:bg-white/10 text-gray-300'
+            }`}
+          >
+            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${theme.gradient}`} />
+            <span className="text-sm">{theme.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   // Initialiser le chat et charger l'historique
   useEffect(() => {
@@ -268,12 +334,23 @@ function Chatbot() {
     }]);
   };
 
+  // Charger le thème sauvegardé
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('chatbot-theme');
+    if (savedTheme && themes[savedTheme]) {
+      setCurrentTheme(savedTheme);
+    }
+  }, []);
+
+  // Fonction pour obtenir les classes du thème actuel
+  const getThemeClasses = () => themes[currentTheme];
+
   return (
     <>
-      {/* Bouton flottant amélioré */}
+      {/* Bouton flottant avec thème */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-3 left-3 bg-gradient-to-r from-pink-500 to-violet-600 rounded-full p-3 text-white shadow-xl hover:scale-110 transition-all duration-300 z-50 group"
+        className={`fixed bottom-3 left-3 bg-gradient-to-r ${getThemeClasses().gradient} rounded-full p-3 text-white shadow-xl hover:scale-110 transition-all duration-300 z-50 group`}
       >
         <div className="relative">
           <FaRobot size={24} className="text-white" />
@@ -289,9 +366,9 @@ function Chatbot() {
 
       {/* Fenêtre du chatbot améliorée */}
       {isOpen && (
-        <div className="fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] bg-[#0d1224] border border-violet-500/20 rounded-2xl shadow-2xl flex flex-col z-50 animate-slideInLeft">
-          {/* Header amélioré avec boutons */}
-          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-pink-500/10 to-violet-600/10 border-b border-violet-500/20 rounded-t-2xl">
+        <div className={`fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] ${getThemeClasses().bg} border ${getThemeClasses().border} rounded-2xl shadow-2xl flex flex-col z-50 animate-slideInLeft`}>
+          {/* Header avec sélecteur de thème */}
+          <div className={`flex items-center justify-between p-3 bg-gradient-to-r ${getThemeClasses().gradient}/10 border-b ${getThemeClasses().border} rounded-t-2xl`}>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Image
@@ -340,6 +417,18 @@ function Chatbot() {
               >
                 <IoMdClose size={20} />
               </button>
+
+              {/* Bouton thème */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowThemeMenu(!showThemeMenu)}
+                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                  title="Changer le thème"
+                >
+                  <IoColorPaletteOutline size={20} className="group-hover:rotate-12 transition-transform" />
+                </button>
+                {showThemeMenu && <ThemeSelector />}
+              </div>
             </div>
           </div>
 
@@ -352,8 +441,8 @@ function Chatbot() {
             </div>
           )}
 
-          {/* Messages avec design amélioré */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
+          {/* Messages avec thème */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3">
             {messages.map((message, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex flex-col">
@@ -377,8 +466,8 @@ function Chatbot() {
                     </div>
                     <div className={`relative max-w-[85%] rounded-2xl p-3 ${
                       message.role === 'user'
-                        ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
-                        : 'bg-[#1b2c68a0] text-white border border-violet-500/20'
+                        ? `bg-gradient-to-r ${getThemeClasses().gradient} text-white`
+                        : `${getThemeClasses().messageBg} text-white border ${getThemeClasses().border}`
                     }`}>
                       <div className="text-sm">{message.content}</div>
                       {message.timestamp && (
@@ -395,7 +484,7 @@ function Chatbot() {
                     {message.showCVButton && (
                       <button
                         onClick={handleDownloadCV}
-                        className="flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-violet-600/20 hover:from-pink-500 hover:to-violet-600 text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border border-violet-500/20 group"
+                        className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
                       >
                         <FaFileDownload size={12} className="group-hover:scale-110 transition-transform" />
                         <span>Télécharger le CV</span>
@@ -409,7 +498,7 @@ function Chatbot() {
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-violet-600/20 hover:from-pink-500 hover:to-violet-600 text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border border-violet-500/20 group"
+                            className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
                           >
                             <span className="group-hover:scale-110 transition-transform">{link.icon}</span>
                             <span>{link.name}</span>
@@ -445,8 +534,8 @@ function Chatbot() {
             )}
           </div>
 
-          {/* Input avec bouton micro */}
-          <form onSubmit={handleSendMessage} className="p-3 border-t border-violet-500/20 bg-gradient-to-r from-pink-500/5 to-violet-600/5">
+          {/* Input avec thème */}
+          <form onSubmit={handleSendMessage} className={`p-3 border-t ${getThemeClasses().border} bg-gradient-to-r ${getThemeClasses().gradient}/5`}>
             <div className="flex items-center gap-2">
               <button
                 type="button"
