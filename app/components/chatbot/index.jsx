@@ -1,23 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { FaRobot, FaFileDownload, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
 import { personalData } from "@/utils/data/personal-data";
 
+const CHAT_HISTORY_KEY = 'chat_history';
+const SESSION_ID_KEY = 'chat_session_id';
+
 function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Bonjour ! Je suis l\'assistant virtuel de Sami. Je peux vous aider à en savoir plus sur ses compétences, vous montrer ses profils professionnels ou vous pouvez télécharger son CV.',
-      showCVButton: true,
-      showSocialLinks: true
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState('');
 
   const socialLinks = [
     {
@@ -32,8 +29,59 @@ function Chatbot() {
     }
   ];
 
-  const handleDownloadCV = () => {
-    window.open(personalData.resume, '_blank');
+  // Initialiser le chat et charger l'historique
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedSessionId = localStorage.getItem(SESSION_ID_KEY);
+      const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
+
+      if (savedSessionId && savedMessages) {
+        try {
+          setSessionId(savedSessionId);
+          setMessages(JSON.parse(savedMessages));
+        } catch (error) {
+          console.error('Error loading chat history:', error);
+          initializeNewChat();
+        }
+      } else {
+        initializeNewChat();
+      }
+    }
+  }, []);
+
+  // Sauvegarder les messages quand ils changent
+  useEffect(() => {
+    if (typeof window !== 'undefined' && messages.length > 0) {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  const initializeNewChat = () => {
+    const newSessionId = generateSessionId();
+    setSessionId(newSessionId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SESSION_ID_KEY, newSessionId);
+    }
+
+    const initialMessage = {
+      role: 'assistant',
+      content: 'Bonjour ! Je suis l\'assistant virtuel de Sami. Je peux vous aider à en savoir plus sur ses compétences, vous montrer ses profils professionnels ou vous pouvez télécharger son CV.',
+      showCVButton: true,
+      showSocialLinks: true
+    };
+
+    setMessages([initialMessage]);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify([initialMessage]));
+    }
+  };
+
+  const generateSessionId = () => {
+    return 'session_' + Math.random().toString(36).substr(2, 9);
+  };
+
+  const handleNewChat = () => {
+    initializeNewChat();
   };
 
   const handleSendMessage = async (e) => {
@@ -42,14 +90,14 @@ function Chatbot() {
 
     const newMessage = {
       role: 'user',
-      content: inputMessage
+      content: inputMessage,
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsLoading(true);
 
-    // Vérifier si le message contient une demande de CV ou de profils
     const cvKeywords = ['cv', 'curriculum', 'vitae', 'resume', 'télécharger'];
     const socialKeywords = ['github', 'linkedin', 'projets', 'profil', 'portfolio', 'réseau'];
     
@@ -66,22 +114,33 @@ function Chatbot() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: inputMessage }),
+        body: JSON.stringify({ 
+          message: inputMessage,
+          sessionId,
+          history: messages.slice(-5) // Envoyer les 5 derniers messages pour le contexte
+        }),
       });
 
       const data = await response.json();
       
-      setMessages(prev => [...prev, {
+      const assistantMessage = {
         role: 'assistant',
         content: data.response,
         showCVButton: askingForCV,
-        showSocialLinks: askingForSocial
-      }]);
+        showSocialLinks: askingForSocial,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDownloadCV = () => {
+    window.open(personalData.resume, '_blank');
   };
 
   const SocialLinks = () => (
@@ -111,12 +170,20 @@ function Chatbot() {
         <FaRobot size={16} className="sm:w-5 sm:h-5" />
       </button>
 
-      {/* Fenêtre du chatbot - dimensions réduites */}
+      {/* Fenêtre du chatbot */}
       {isOpen && (
         <div className="fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] bg-[#0d1224] border border-[#1b2c68a0] rounded-lg shadow-xl flex flex-col z-50">
-          {/* Header - plus compact */}
+          {/* Header avec bouton nouvelle conversation */}
           <div className="flex items-center justify-between p-2 sm:p-3 border-b border-[#1b2c68a0]">
-            <h3 className="text-white font-semibold text-xs sm:text-sm">Assistant IA</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-white font-semibold text-xs sm:text-sm">Assistant IA</h3>
+              <button
+                onClick={handleNewChat}
+                className="text-xs text-gray-400 hover:text-white transition-colors"
+              >
+                Nouvelle conversation
+              </button>
+            </div>
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-white transition-colors"
@@ -125,18 +192,27 @@ function Chatbot() {
             </button>
           </div>
 
-          {/* Messages - espacement réduit */}
+          {/* Messages avec timestamps */}
           <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
             {messages.map((message, index) => (
               <div key={index} className="space-y-2">
-                <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
-                    message.role === 'user'
-                      ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
-                      : 'bg-[#1b2c68a0] text-white'
-                  }`}>
-                    {message.content}
+                <div className="flex flex-col">
+                  <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
+                      message.role === 'user'
+                        ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
+                        : 'bg-[#1b2c68a0] text-white'
+                    }`}>
+                      {message.content}
+                    </div>
                   </div>
+                  {message.timestamp && (
+                    <span className={`text-[10px] text-gray-500 mt-1 ${
+                      message.role === 'user' ? 'text-right' : 'text-left'
+                    }`}>
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </span>
+                  )}
                 </div>
                 {message.role === 'assistant' && (
                   <div className="flex flex-col gap-2">
