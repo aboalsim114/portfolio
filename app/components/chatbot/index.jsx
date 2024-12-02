@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import { FaRobot, FaFileDownload, FaGithub, FaLinkedin, FaUser } from 'react-icons/fa';
+import { FaRobot, FaFileDownload, FaGithub, FaLinkedin, FaUser, FaStar } from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
 import { personalData } from "@/utils/data/personal-data";
 import Image from 'next/image';
@@ -144,117 +144,117 @@ function Chatbot() {
     window.open(personalData.resume, '_blank');
   };
 
-  const SocialLinks = () => (
-    <div className="flex gap-2">
-      {socialLinks.map((link, index) => (
-        <a
-          key={index}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
-        >
-          {link.icon}
-          {link.name}
-        </a>
-      ))}
-    </div>
-  );
-
   return (
     <>
-      {/* Bouton flottant du chatbot - réduit */}
+      {/* Bouton flottant amélioré */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-3 left-3 bg-gradient-to-r from-pink-500 to-violet-600 rounded-full p-2 sm:p-3 text-white shadow-lg hover:scale-110 transition-all duration-200 z-50"
+        className="fixed bottom-3 left-3 bg-gradient-to-r from-pink-500 to-violet-600 rounded-full p-3 text-white shadow-xl hover:scale-110 transition-all duration-300 z-50 group"
       >
-        <FaRobot size={16} className="sm:w-5 sm:h-5" />
+        <div className="relative">
+          <FaRobot size={24} className="text-white" />
+          <span className="absolute -top-1 -right-1 w-3 h-3">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+          </span>
+        </div>
+        <span className="absolute left-full ml-4 bg-black/80 backdrop-blur-sm text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+          Assistant IA
+        </span>
       </button>
 
-      {/* Fenêtre du chatbot */}
+      {/* Fenêtre du chatbot améliorée */}
       {isOpen && (
-        <div className="fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] bg-[#0d1224] border border-[#1b2c68a0] rounded-lg shadow-xl flex flex-col z-50">
-          {/* Header avec bouton nouvelle conversation */}
-          <div className="flex items-center justify-between p-2 sm:p-3 border-b border-[#1b2c68a0]">
-            <div className="flex items-center gap-2">
-              <h3 className="text-white font-semibold text-xs sm:text-sm">Assistant IA</h3>
-              <button
-                onClick={handleNewChat}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
-              >
-                Nouvelle conversation
-              </button>
+        <div className="fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] bg-[#0d1224] border border-violet-500/20 rounded-2xl shadow-2xl flex flex-col z-50 animate-slideInLeft">
+          {/* Header amélioré */}
+          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-pink-500/10 to-violet-600/10 border-b border-violet-500/20 rounded-t-2xl">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Image
+                  src={personalData.profile}
+                  alt="Assistant Avatar"
+                  width={40}
+                  height={40}
+                  className="rounded-full border-2 border-violet-500"
+                />
+                <FaStar className="absolute -top-1 -right-1 text-yellow-400 animate-pulse" size={12} />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm">Assistant IA</h3>
+                <p className="text-xs text-gray-400">Développé par Sami</p>
+              </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
             >
-              <IoMdClose size={16} className="sm:w-5 sm:h-5" />
+              <IoMdClose size={20} />
             </button>
           </div>
 
-          {/* Messages avec avatars */}
-          <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
+          {/* Messages avec design amélioré */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
             {messages.map((message, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex flex-col">
                   <div className={`flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    {/* Avatar */}
                     <div className="flex-shrink-0">
                       {message.role === 'assistant' ? (
-                        <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-violet-500">
+                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500 shadow-lg">
                           <Image
                             src={personalData.profile}
                             alt="Assistant Avatar"
-                            width={24}
-                            height={24}
+                            width={32}
+                            height={32}
                             className="w-full h-full object-cover"
                           />
                         </div>
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center">
-                          <FaUser size={12} className="text-white" />
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center shadow-lg">
+                          <FaUser size={14} className="text-white" />
                         </div>
                       )}
                     </div>
-
-                    {/* Message Content */}
-                    <div className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
+                    <div className={`relative max-w-[85%] rounded-2xl p-3 ${
                       message.role === 'user'
                         ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
-                        : 'bg-[#1b2c68a0] text-white'
+                        : 'bg-[#1b2c68a0] text-white border border-violet-500/20'
                     }`}>
-                      {message.content}
+                      <div className="text-sm">{message.content}</div>
+                      {message.timestamp && (
+                        <span className="absolute bottom-1 right-2 text-[10px] text-gray-400/80">
+                          {new Date(message.timestamp).toLocaleTimeString()}
+                        </span>
+                      )}
                     </div>
                   </div>
-
-                  {/* Timestamp */}
-                  {message.timestamp && (
-                    <span className={`text-[10px] text-gray-500 mt-1 ${
-                      message.role === 'user' ? 'text-right mr-8' : 'text-left ml-8'
-                    }`}>
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </span>
-                  )}
                 </div>
 
-                {/* Buttons sous le message */}
                 {message.role === 'assistant' && (
-                  <div className="flex flex-col gap-2 ml-8">
+                  <div className="flex flex-col gap-2 ml-10">
                     {message.showCVButton && (
-                      <div className="flex justify-start">
-                        <button
-                          onClick={handleDownloadCV}
-                          className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
-                        >
-                          <FaFileDownload size={12} />
-                          Télécharger le CV
-                        </button>
-                      </div>
+                      <button
+                        onClick={handleDownloadCV}
+                        className="flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-violet-600/20 hover:from-pink-500 hover:to-violet-600 text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border border-violet-500/20 group"
+                      >
+                        <FaFileDownload size={12} className="group-hover:scale-110 transition-transform" />
+                        <span>Télécharger le CV</span>
+                      </button>
                     )}
                     {message.showSocialLinks && (
-                      <div className="flex justify-start">
-                        <SocialLinks />
+                      <div className="flex gap-2">
+                        {socialLinks.map((link, index) => (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 bg-gradient-to-r from-pink-500/20 to-violet-600/20 hover:from-pink-500 hover:to-violet-600 text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border border-violet-500/20 group"
+                          >
+                            <span className="group-hover:scale-110 transition-transform">{link.icon}</span>
+                            <span>{link.name}</span>
+                          </a>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -262,41 +262,45 @@ function Chatbot() {
               </div>
             ))}
 
-            {/* Loading state avec avatar */}
+            {/* État de chargement amélioré */}
             {isLoading && (
               <div className="flex items-start gap-2">
-                <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-violet-500">
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500">
                   <Image
                     src={personalData.profile}
                     alt="Assistant Avatar"
-                    width={24}
-                    height={24}
+                    width={32}
+                    height={32}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="bg-[#1b2c68a0] text-white max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm">
-                  En train d'écrire...
+                <div className="bg-[#1b2c68a0] text-white max-w-[85%] rounded-2xl p-3 border border-violet-500/20">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0s' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.4s' }} />
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Input - plus compact */}
-          <form onSubmit={handleSendMessage} className="p-2 sm:p-3 border-t border-[#1b2c68a0]">
+          {/* Input amélioré */}
+          <form onSubmit={handleSendMessage} className="p-3 border-t border-violet-500/20 bg-gradient-to-r from-pink-500/5 to-violet-600/5">
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Écrivez votre message..."
-                className="flex-1 bg-[#1b2c68a0] text-white rounded-lg px-2 py-1.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-600"
+                className="flex-1 bg-[#1b2c68a0] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 border border-violet-500/20 placeholder-gray-400"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-pink-500 to-violet-600 text-white p-1.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="bg-gradient-to-r from-pink-500 to-violet-600 text-white p-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <IoSend size={14} className="sm:w-4 sm:h-4" />
+                <IoSend size={20} className="transform rotate-45" />
               </button>
             </div>
           </form>
