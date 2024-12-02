@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import { FaRobot, FaFileDownload, FaGithub, FaLinkedin } from 'react-icons/fa';
+import { FaRobot, FaFileDownload, FaGithub, FaLinkedin, FaUser } from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
 import { personalData } from "@/utils/data/personal-data";
+import Image from 'next/image';
 
 const CHAT_HISTORY_KEY = 'chat_history';
 const SESSION_ID_KEY = 'chat_session_id';
@@ -192,12 +193,32 @@ function Chatbot() {
             </button>
           </div>
 
-          {/* Messages avec timestamps */}
+          {/* Messages avec avatars */}
           <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
             {messages.map((message, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex flex-col">
-                  <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      {message.role === 'assistant' ? (
+                        <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-violet-500">
+                          <Image
+                            src={personalData.profile}
+                            alt="Assistant Avatar"
+                            width={24}
+                            height={24}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center">
+                          <FaUser size={12} className="text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Message Content */}
                     <div className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
                       message.role === 'user'
                         ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
@@ -206,16 +227,20 @@ function Chatbot() {
                       {message.content}
                     </div>
                   </div>
+
+                  {/* Timestamp */}
                   {message.timestamp && (
                     <span className={`text-[10px] text-gray-500 mt-1 ${
-                      message.role === 'user' ? 'text-right' : 'text-left'
+                      message.role === 'user' ? 'text-right mr-8' : 'text-left ml-8'
                     }`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </span>
                   )}
                 </div>
+
+                {/* Buttons sous le message */}
                 {message.role === 'assistant' && (
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 ml-8">
                     {message.showCVButton && (
                       <div className="flex justify-start">
                         <button
@@ -236,8 +261,19 @@ function Chatbot() {
                 )}
               </div>
             ))}
+
+            {/* Loading state avec avatar */}
             {isLoading && (
-              <div className="flex justify-start">
+              <div className="flex items-start gap-2">
+                <div className="w-6 h-6 rounded-full overflow-hidden border-2 border-violet-500">
+                  <Image
+                    src={personalData.profile}
+                    alt="Assistant Avatar"
+                    width={24}
+                    height={24}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="bg-[#1b2c68a0] text-white max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm">
                   En train d'écrire...
                 </div>
