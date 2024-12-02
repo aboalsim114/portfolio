@@ -12,6 +12,7 @@ import { BiReset } from 'react-icons/bi';
 import { MdColorLens, MdStyle } from 'react-icons/md';
 import { IoColorPaletteOutline } from 'react-icons/io5';
 import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
 
 const CHAT_HISTORY_KEY = 'chat_history';
 const SESSION_ID_KEY = 'chat_session_id';
@@ -251,6 +252,10 @@ function Chatbot() {
 
       const data = await response.json();
       
+      if (!response.ok) {
+        throw new Error(data.message || 'Une erreur est survenue');
+      }
+
       const assistantMessage = {
         role: 'assistant',
         content: data.response,
@@ -264,7 +269,15 @@ function Chatbot() {
       // Lire la réponse à voix haute
       speakResponse(data.response);
     } catch (error) {
-      console.error('Error:', error);
+      Swal.fire({
+        title: 'Erreur !',
+        text: error.message || 'Une erreur est survenue lors de l\'envoi du message',
+        icon: 'error',
+        background: '#0d1224',
+        color: '#fff',
+        timer: 3000,
+        showConfirmButton: false
+      });
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +290,15 @@ function Chatbot() {
   // Fonction pour démarrer/arrêter la reconnaissance vocale
   const toggleVoiceRecognition = () => {
     if (!recognitionRef.current) {
-      alert("La reconnaissance vocale n'est pas supportée par votre navigateur.");
+      Swal.fire({
+        title: 'Non supporté',
+        text: 'La reconnaissance vocale n\'est pas supportée par votre navigateur.',
+        icon: 'error',
+        background: '#0d1224',
+        color: '#fff',
+        timer: 3000,
+        showConfirmButton: false
+      });
       return;
     }
 
@@ -285,6 +306,17 @@ function Chatbot() {
       recognitionRef.current.stop();
     } else {
       recognitionRef.current.start();
+      Swal.fire({
+        title: 'Écoute active',
+        text: 'Je vous écoute...',
+        icon: 'info',
+        background: '#0d1224',
+        color: '#fff',
+        timer: 2000,
+        showConfirmButton: false,
+        position: 'top-end',
+        toast: true
+      });
     }
   };
 
@@ -314,14 +346,37 @@ function Chatbot() {
 
   // Fonction pour effacer l'historique
   const clearHistory = () => {
-    if (window.confirm('Voulez-vous vraiment effacer tout l\'historique de conversation ?')) {
-      setMessages([{
-        role: 'assistant',
-        content: 'Historique effacé. Comment puis-je vous aider ?',
-        timestamp: new Date().toISOString()
-      }]);
-      localStorage.removeItem(CHAT_HISTORY_KEY);
-    }
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: "Voulez-vous vraiment effacer tout l'historique de conversation ?",
+      icon: 'warning',
+      background: '#0d1224',
+      color: '#fff',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui, effacer',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setMessages([{
+          role: 'assistant',
+          content: 'Historique effacé. Comment puis-je vous aider ?',
+          timestamp: new Date().toISOString()
+        }]);
+        localStorage.removeItem(CHAT_HISTORY_KEY);
+        
+        Swal.fire({
+          title: 'Effacé !',
+          text: 'L\'historique a été effacé avec succès.',
+          icon: 'success',
+          background: '#0d1224',
+          color: '#fff',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }
+    });
   };
 
   // Fonction pour démarrer un nouveau chat
