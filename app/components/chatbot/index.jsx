@@ -11,6 +11,7 @@ import { VscClearAll } from 'react-icons/vsc';
 import { BiReset } from 'react-icons/bi';
 import { MdColorLens, MdStyle } from 'react-icons/md';
 import { IoColorPaletteOutline } from 'react-icons/io5';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CHAT_HISTORY_KEY = 'chat_history';
 const SESSION_ID_KEY = 'chat_session_id';
@@ -345,12 +346,62 @@ function Chatbot() {
   // Fonction pour obtenir les classes du thème actuel
   const getThemeClasses = () => themes[currentTheme];
 
+  // Animations pour le chatbot
+  const chatbotVariants = {
+    hidden: { 
+      opacity: 0, 
+      x: -50,
+      scale: 0.9 
+    },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 25
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      x: -50,
+      scale: 0.9,
+      transition: { 
+        duration: 0.2 
+      }
+    }
+  };
+
+  // Animations pour les messages
+  const messageVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 20,
+      scale: 0.9 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 500,
+        damping: 25
+      }
+    }
+  };
+
   return (
     <>
-      {/* Bouton flottant avec thème */}
-      <button
+      {/* Bouton flottant animé */}
+      <motion.button
         onClick={() => setIsOpen(true)}
         className={`fixed bottom-3 left-3 bg-gradient-to-r ${getThemeClasses().gradient} rounded-full p-3 text-white shadow-xl hover:scale-110 transition-all duration-300 z-50 group`}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
         <div className="relative">
           <FaRobot size={24} className="text-white" />
@@ -362,230 +413,294 @@ function Chatbot() {
         <span className="absolute left-full ml-4 bg-black/80 backdrop-blur-sm text-white text-sm py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
           Assistant IA
         </span>
-      </button>
+      </motion.button>
 
-      {/* Fenêtre du chatbot améliorée */}
-      {isOpen && (
-        <div className={`fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] ${getThemeClasses().bg} border ${getThemeClasses().border} rounded-2xl shadow-2xl flex flex-col z-50 animate-slideInLeft`}>
-          {/* Header avec sélecteur de thème */}
-          <div className={`flex items-center justify-between p-3 bg-gradient-to-r ${getThemeClasses().gradient}/10 border-b ${getThemeClasses().border} rounded-t-2xl`}>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Image
-                  src={personalData.profile}
-                  alt="Assistant Avatar"
-                  width={40}
-                  height={40}
-                  className="rounded-full border-2 border-violet-500"
-                />
-                <FaStar className="absolute -top-1 -right-1 text-yellow-400 animate-pulse" size={12} />
-              </div>
-              <div>
-                <h3 className="text-white font-semibold text-sm">Assistant IA</h3>
-                <p className="text-xs text-gray-400">Développé par Sami</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Bouton nouveau chat */}
-              <button
-                onClick={startNewChat}
-                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
-                title="Nouveau chat"
-              >
-                <BiReset size={20} className="group-hover:rotate-180 transition-transform duration-300" />
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Nouveau chat
-                </span>
-              </button>
-
-              {/* Bouton effacer historique */}
-              <button
-                onClick={clearHistory}
-                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
-                title="Effacer l'historique"
-              >
-                <VscClearAll size={20} />
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Effacer l'historique
-                </span>
-              </button>
-
-              {/* Bouton fermer existant */}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-              >
-                <IoMdClose size={20} />
-              </button>
-
-              {/* Bouton thème */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowThemeMenu(!showThemeMenu)}
-                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
-                  title="Changer le thème"
-                >
-                  <IoColorPaletteOutline size={20} className="group-hover:rotate-12 transition-transform" />
-                </button>
-                {showThemeMenu && <ThemeSelector />}
-              </div>
-            </div>
-          </div>
-
-          {/* Bannière d'information après effacement */}
-          {messages.length === 1 && (
-            <div className="bg-violet-500/10 border-b border-violet-500/20 px-4 py-2">
-              <p className="text-xs text-gray-300 text-center">
-                Nouvelle conversation démarrée
-              </p>
-            </div>
-          )}
-
-          {/* Messages avec thème */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {messages.map((message, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex flex-col">
-                  <div className={`flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className="flex-shrink-0">
-                      {message.role === 'assistant' ? (
-                        <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500 shadow-lg">
-                          <Image
-                            src={personalData.profile}
-                            alt="Assistant Avatar"
-                            width={32}
-                            height={32}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center shadow-lg">
-                          <FaUser size={14} className="text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className={`relative max-w-[85%] rounded-2xl p-3 ${
-                      message.role === 'user'
-                        ? `bg-gradient-to-r ${getThemeClasses().gradient} text-white`
-                        : `${getThemeClasses().messageBg} text-white border ${getThemeClasses().border}`
-                    }`}>
-                      <div className="text-sm">{message.content}</div>
-                      {message.timestamp && (
-                        <span className="absolute bottom-1 right-2 text-[10px] text-gray-400/80">
-                          {new Date(message.timestamp).toLocaleTimeString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {message.role === 'assistant' && (
-                  <div className="flex flex-col gap-2 ml-10">
-                    {message.showCVButton && (
-                      <button
-                        onClick={handleDownloadCV}
-                        className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
-                      >
-                        <FaFileDownload size={12} className="group-hover:scale-110 transition-transform" />
-                        <span>Télécharger le CV</span>
-                      </button>
-                    )}
-                    {message.showSocialLinks && (
-                      <div className="flex gap-2">
-                        {socialLinks.map((link, index) => (
-                          <a
-                            key={index}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
-                          >
-                            <span className="group-hover:scale-110 transition-transform">{link.icon}</span>
-                            <span>{link.name}</span>
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {/* État de chargement amélioré */}
-            {isLoading && (
-              <div className="flex items-start gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500">
+      {/* Fenêtre du chatbot avec animations */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            variants={chatbotVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className={`fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] ${getThemeClasses().bg} border ${getThemeClasses().border} rounded-2xl shadow-2xl flex flex-col z-50`}
+          >
+            {/* Header avec animation */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex items-center justify-between p-3 bg-gradient-to-r ${getThemeClasses().gradient}/10 border-b ${getThemeClasses().border} rounded-t-2xl`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative">
                   <Image
                     src={personalData.profile}
                     alt="Assistant Avatar"
-                    width={32}
-                    height={32}
-                    className="w-full h-full object-cover"
+                    width={40}
+                    height={40}
+                    className="rounded-full border-2 border-violet-500"
                   />
+                  <FaStar className="absolute -top-1 -right-1 text-yellow-400 animate-pulse" size={12} />
                 </div>
-                <div className="bg-[#1b2c68a0] text-white max-w-[85%] rounded-2xl p-3 border border-violet-500/20">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0s' }} />
-                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
-                    <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.4s' }} />
-                  </div>
+                <div>
+                  <h3 className="text-white font-semibold text-sm">Assistant IA</h3>
+                  <p className="text-xs text-gray-400">Développé par Sami</p>
                 </div>
               </div>
-            )}
-          </div>
+              <div className="flex items-center gap-2">
+                {/* Bouton nouveau chat */}
+                <button
+                  onClick={startNewChat}
+                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                  title="Nouveau chat"
+                >
+                  <BiReset size={20} className="group-hover:rotate-180 transition-transform duration-300" />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Nouveau chat
+                  </span>
+                </button>
 
-          {/* Input avec thème */}
-          <form onSubmit={handleSendMessage} className={`p-3 border-t ${getThemeClasses().border} bg-gradient-to-r ${getThemeClasses().gradient}/5`}>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleVoiceRecognition}
-                className={`p-2 rounded-xl transition-all duration-300 ${
-                  isListening
-                    ? 'bg-red-500 hover:bg-red-600'
-                    : 'bg-gradient-to-r from-pink-500 to-violet-600 hover:opacity-90'
-                }`}
-              >
-                {isListening ? (
-                  <FaMicrophoneSlash size={20} className="text-white animate-pulse" />
-                ) : (
-                  <FaMicrophone size={20} className="text-white" />
-                )}
-              </button>
+                {/* Bouton effacer historique */}
+                <button
+                  onClick={clearHistory}
+                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                  title="Effacer l'historique"
+                >
+                  <VscClearAll size={20} />
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Effacer l'historique
+                  </span>
+                </button>
 
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={isListening ? 'Je vous écoute...' : 'Écrivez ou parlez...'}
-                className="flex-1 bg-[#1b2c68a0] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 border border-violet-500/20 placeholder-gray-400"
-              />
+                {/* Bouton fermer existant */}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+                >
+                  <IoMdClose size={20} />
+                </button>
 
-              {/* Indicateur de parole en cours */}
-              {isSpeaking && (
-                <div className="flex items-center">
-                  <BsSoundwave size={20} className="text-violet-500 animate-pulse" />
+                {/* Bouton thème */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowThemeMenu(!showThemeMenu)}
+                    className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                    title="Changer le thème"
+                  >
+                    <IoColorPaletteOutline size={20} className="group-hover:rotate-12 transition-transform" />
+                  </button>
+                  {showThemeMenu && <ThemeSelector />}
                 </div>
-              )}
+              </div>
+            </motion.div>
 
-              <button
-                type="submit"
-                disabled={isLoading || (!inputMessage.trim() && !isListening)}
-                className="bg-gradient-to-r from-pink-500 to-violet-600 text-white p-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <IoSend size={20} className="transform rotate-45" />
-              </button>
+            {/* Bannière d'information après effacement */}
+            {messages.length === 1 && (
+              <div className="bg-violet-500/10 border-b border-violet-500/20 px-4 py-2">
+                <p className="text-xs text-gray-300 text-center">
+                  Nouvelle conversation démarrée
+                </p>
+              </div>
+            )}
+
+            {/* Messages avec animations */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={index}
+                  variants={messageVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={index}
+                  className="space-y-2"
+                >
+                  <div className="flex flex-col">
+                    <div className={`flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <div className="flex-shrink-0">
+                        {message.role === 'assistant' ? (
+                          <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500 shadow-lg">
+                            <Image
+                              src={personalData.profile}
+                              alt="Assistant Avatar"
+                              width={32}
+                              height={32}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 flex items-center justify-center shadow-lg">
+                            <FaUser size={14} className="text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className={`relative max-w-[85%] rounded-2xl p-3 ${
+                        message.role === 'user'
+                          ? `bg-gradient-to-r ${getThemeClasses().gradient} text-white`
+                          : `${getThemeClasses().messageBg} text-white border ${getThemeClasses().border}`
+                      }`}>
+                        <div className="text-sm">{message.content}</div>
+                        {message.timestamp && (
+                          <span className="absolute bottom-1 right-2 text-[10px] text-gray-400/80">
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {message.role === 'assistant' && (
+                    <div className="flex flex-col gap-2 ml-10">
+                      {message.showCVButton && (
+                        <button
+                          onClick={handleDownloadCV}
+                          className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
+                        >
+                          <FaFileDownload size={12} className="group-hover:scale-110 transition-transform" />
+                          <span>Télécharger le CV</span>
+                        </button>
+                      )}
+                      {message.showSocialLinks && (
+                        <div className="flex gap-2">
+                          {socialLinks.map((link, index) => (
+                            <a
+                              key={index}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`flex items-center gap-2 bg-gradient-to-r ${getThemeClasses().gradient}/20 hover:${getThemeClasses().gradient} text-white px-4 py-2 rounded-xl text-xs transition-all duration-300 border ${getThemeClasses().border} group`}
+                            >
+                              <span className="group-hover:scale-110 transition-transform">{link.icon}</span>
+                              <span>{link.name}</span>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+
+              {/* État de chargement animé */}
+              <AnimatePresence>
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="flex items-start gap-2"
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-violet-500">
+                      <Image
+                        src={personalData.profile}
+                        alt="Assistant Avatar"
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="bg-[#1b2c68a0] text-white max-w-[85%] rounded-2xl p-3 border border-violet-500/20">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0s' }} />
+                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0.4s' }} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Transcription en cours */}
-            {isListening && transcript && (
-              <div className="mt-2 text-xs text-gray-400 italic">
-                {transcript}
+            {/* Input avec animation */}
+            <motion.form
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              onSubmit={handleSendMessage}
+              className={`p-3 border-t ${getThemeClasses().border} bg-gradient-to-r ${getThemeClasses().gradient}/5`}
+            >
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={toggleVoiceRecognition}
+                  className={`p-2 rounded-xl transition-all duration-300 ${
+                    isListening
+                      ? 'bg-red-500 hover:bg-red-600'
+                      : 'bg-gradient-to-r from-pink-500 to-violet-600 hover:opacity-90'
+                  }`}
+                >
+                  {isListening ? (
+                    <FaMicrophoneSlash size={20} className="text-white animate-pulse" />
+                  ) : (
+                    <FaMicrophone size={20} className="text-white" />
+                  )}
+                </button>
+
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder={isListening ? 'Je vous écoute...' : 'Écrivez ou parlez...'}
+                  className="flex-1 bg-[#1b2c68a0] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 border border-violet-500/20 placeholder-gray-400"
+                />
+
+                {/* Indicateur de parole en cours */}
+                {isSpeaking && (
+                  <div className="flex items-center">
+                    <BsSoundwave size={20} className="text-violet-500 animate-pulse" />
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isLoading || (!inputMessage.trim() && !isListening)}
+                  className="bg-gradient-to-r from-pink-500 to-violet-600 text-white p-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <IoSend size={20} className="transform rotate-45" />
+                </button>
               </div>
-            )}
-          </form>
-        </div>
-      )}
+
+              {/* Transcription en cours */}
+              {isListening && transcript && (
+                <div className="mt-2 text-xs text-gray-400 italic">
+                  {transcript}
+                </div>
+              )}
+            </motion.form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Menu des thèmes avec animation */}
+      <AnimatePresence>
+        {showThemeMenu && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="absolute right-0 top-12 bg-black/90 backdrop-blur-sm rounded-lg p-2 border border-gray-700 z-50"
+          >
+            <div className="space-y-2">
+              {Object.entries(themes).map(([key, theme]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setCurrentTheme(key);
+                    setShowThemeMenu(false);
+                    localStorage.setItem('chatbot-theme', key);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    currentTheme === key 
+                      ? `bg-gradient-to-r ${theme.gradient} text-white`
+                      : 'hover:bg-white/10 text-gray-300'
+                  }`}
+                >
+                  <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${theme.gradient}`} />
+                  <span className="text-sm">{theme.name}</span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
