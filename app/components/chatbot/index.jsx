@@ -7,6 +7,8 @@ import { IoSend } from 'react-icons/io5';
 import { BsSoundwave } from 'react-icons/bs';
 import { personalData } from "@/utils/data/personal-data";
 import Image from 'next/image';
+import { VscClearAll } from 'react-icons/vsc';
+import { BiReset } from 'react-icons/bi';
 
 const CHAT_HISTORY_KEY = 'chat_history';
 const SESSION_ID_KEY = 'chat_session_id';
@@ -243,6 +245,29 @@ function Chatbot() {
     synthRef.current.speak(utterance);
   };
 
+  // Fonction pour effacer l'historique
+  const clearHistory = () => {
+    if (window.confirm('Voulez-vous vraiment effacer tout l\'historique de conversation ?')) {
+      setMessages([{
+        role: 'assistant',
+        content: 'Historique effacé. Comment puis-je vous aider ?',
+        timestamp: new Date().toISOString()
+      }]);
+      localStorage.removeItem(CHAT_HISTORY_KEY);
+    }
+  };
+
+  // Fonction pour démarrer un nouveau chat
+  const startNewChat = () => {
+    setMessages([{
+      role: 'assistant',
+      content: 'Bonjour ! Je suis l\'assistant virtuel de Sami. Comment puis-je vous aider ?',
+      showCVButton: true,
+      showSocialLinks: true,
+      timestamp: new Date().toISOString()
+    }]);
+  };
+
   return (
     <>
       {/* Bouton flottant amélioré */}
@@ -265,7 +290,7 @@ function Chatbot() {
       {/* Fenêtre du chatbot améliorée */}
       {isOpen && (
         <div className="fixed bottom-3 left-3 w-[80vw] sm:w-[300px] md:w-[320px] h-[70vh] sm:h-[400px] bg-[#0d1224] border border-violet-500/20 rounded-2xl shadow-2xl flex flex-col z-50 animate-slideInLeft">
-          {/* Header amélioré */}
+          {/* Header amélioré avec boutons */}
           <div className="flex items-center justify-between p-3 bg-gradient-to-r from-pink-500/10 to-violet-600/10 border-b border-violet-500/20 rounded-t-2xl">
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -283,13 +308,49 @@ function Chatbot() {
                 <p className="text-xs text-gray-400">Développé par Sami</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
-            >
-              <IoMdClose size={20} />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Bouton nouveau chat */}
+              <button
+                onClick={startNewChat}
+                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                title="Nouveau chat"
+              >
+                <BiReset size={20} className="group-hover:rotate-180 transition-transform duration-300" />
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Nouveau chat
+                </span>
+              </button>
+
+              {/* Bouton effacer historique */}
+              <button
+                onClick={clearHistory}
+                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg group relative"
+                title="Effacer l'historique"
+              >
+                <VscClearAll size={20} />
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Effacer l'historique
+                </span>
+              </button>
+
+              {/* Bouton fermer existant */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg"
+              >
+                <IoMdClose size={20} />
+              </button>
+            </div>
           </div>
+
+          {/* Bannière d'information après effacement */}
+          {messages.length === 1 && (
+            <div className="bg-violet-500/10 border-b border-violet-500/20 px-4 py-2">
+              <p className="text-xs text-gray-300 text-center">
+                Nouvelle conversation démarrée
+              </p>
+            </div>
+          )}
 
           {/* Messages avec design amélioré */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-violet-500/20 scrollbar-track-transparent">
