@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import { FaRobot, FaFileDownload, FaGithub, FaLinkedin, FaUser, FaStar } from 'react-icons/fa';
+import { FaRobot, FaFileDownload, FaGithub, FaLinkedin, FaUser, FaStar, FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
+import { BsSoundwave } from 'react-icons/bs';
 import { personalData } from "@/utils/data/personal-data";
 import Image from 'next/image';
 
@@ -16,6 +17,9 @@ function Chatbot() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [transcript, setTranscript] = useState('');
 
   const socialLinks = [
     {
@@ -29,6 +33,9 @@ function Chatbot() {
       icon: <FaLinkedin size={12} />
     }
   ];
+
+  const recognitionRef = useRef(null);
+  const synthRef = useRef(null);
 
   // Initialiser le chat et charger l'historique
   useEffect(() => {
@@ -56,6 +63,57 @@ function Chatbot() {
       localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
     }
   }, [messages]);
+
+  // Initialisation de la reconnaissance vocale
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.webkitSpeechRecognition) {
+        const SpeechRecognition = window.webkitSpeechRecognition;
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.lang = 'fr-FR';
+        recognitionRef.current.interimResults = true;
+
+        recognitionRef.current.onstart = () => {
+          setIsListening(true);
+          setTranscript('Je vous écoute...');
+        };
+
+        recognitionRef.current.onresult = (event) => {
+          const text = event.results[0][0].transcript;
+          setTranscript(text);
+          if (event.results[0].isFinal) {
+            setInputMessage(text);
+            setTimeout(() => handleSendMessage({ preventDefault: () => {} }), 500);
+          }
+        };
+
+        recognitionRef.current.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          setTranscript('Erreur de reconnaissance vocale');
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+
+      // Initialisation de la synthèse vocale
+      if (window.speechSynthesis) {
+        synthRef.current = window.speechSynthesis;
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+      if (synthRef.current) {
+        synthRef.current.cancel();
+      }
+    };
+  }, []);
 
   const initializeNewChat = () => {
     const newSessionId = generateSessionId();
@@ -133,6 +191,9 @@ function Chatbot() {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Lire la réponse à voix haute
+      speakResponse(data.response);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -142,6 +203,44 @@ function Chatbot() {
 
   const handleDownloadCV = () => {
     window.open(personalData.resume, '_blank');
+  };
+
+  // Fonction pour démarrer/arrêter la reconnaissance vocale
+  const toggleVoiceRecognition = () => {
+    if (!recognitionRef.current) {
+      alert("La reconnaissance vocale n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
+    }
+  };
+
+  // Fonction pour la synthèse vocale
+  const speakResponse = (text) => {
+    if (!synthRef.current) return;
+
+    synthRef.current.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    utterance.volume = 1;
+
+    // Sélection d'une voix française
+    const voices = synthRef.current.getVoices();
+    const frenchVoice = voices.find(voice => voice.lang.includes('fr'));
+    if (frenchVoice) {
+      utterance.voice = frenchVoice;
+    }
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+
+    synthRef.current.speak(utterance);
   };
 
   return (
@@ -285,24 +384,55 @@ function Chatbot() {
             )}
           </div>
 
-          {/* Input amélioré */}
+          {/* Input avec bouton micro */}
           <form onSubmit={handleSendMessage} className="p-3 border-t border-violet-500/20 bg-gradient-to-r from-pink-500/5 to-violet-600/5">
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleVoiceRecognition}
+                className={`p-2 rounded-xl transition-all duration-300 ${
+                  isListening
+                    ? 'bg-red-500 hover:bg-red-600'
+                    : 'bg-gradient-to-r from-pink-500 to-violet-600 hover:opacity-90'
+                }`}
+              >
+                {isListening ? (
+                  <FaMicrophoneSlash size={20} className="text-white animate-pulse" />
+                ) : (
+                  <FaMicrophone size={20} className="text-white" />
+                )}
+              </button>
+
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Écrivez votre message..."
+                placeholder={isListening ? 'Je vous écoute...' : 'Écrivez ou parlez...'}
                 className="flex-1 bg-[#1b2c68a0] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 border border-violet-500/20 placeholder-gray-400"
               />
+
+              {/* Indicateur de parole en cours */}
+              {isSpeaking && (
+                <div className="flex items-center">
+                  <BsSoundwave size={20} className="text-violet-500 animate-pulse" />
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || (!inputMessage.trim() && !isListening)}
                 className="bg-gradient-to-r from-pink-500 to-violet-600 text-white p-2 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <IoSend size={20} className="transform rotate-45" />
               </button>
             </div>
+
+            {/* Transcription en cours */}
+            {isListening && transcript && (
+              <div className="mt-2 text-xs text-gray-400 italic">
+                {transcript}
+              </div>
+            )}
           </form>
         </div>
       )}
