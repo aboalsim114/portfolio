@@ -1,3 +1,5 @@
+"use client";
+
 // @flow strict
 
 import { personalData } from "@/utils/data/personal-data";
@@ -8,8 +10,30 @@ import { FaFacebook, FaTwitterSquare } from "react-icons/fa";
 import { MdDownload } from "react-icons/md";
 import { RiContactsFill } from "react-icons/ri";
 import { SiLeetcode } from "react-icons/si";
+import { useEffect, useRef } from "react";
+import Typed from "typed.js";
 
 function HeroSection() {
+  const typedRef = useRef(null);
+
+  useEffect(() => {
+    const typed = new Typed(typedRef.current, {
+      strings: [
+        "Développeur Full Stack",
+        "recherche d'une alternance",
+       
+      ],
+      typeSpeed: 90,
+      backSpeed: 30,
+      backDelay: 1500,
+      loop: true,
+    });
+
+    return () => {
+      typed.destroy();
+    };
+  }, []);
+
   return (
     <section className="relative flex flex-col items-center justify-between py-4 lg:py-12">
       <Image
@@ -28,7 +52,9 @@ function HeroSection() {
               <span className="text-pink-500">Abdulhalim Sami</span>
             </span>
             <span className="block mt-2">
-              <span className="text-[#16f2b3]">Développeur Full Stack</span>
+              <span className="text-[#16f2b3]">
+                <span ref={typedRef}></span>
+              </span>
               <span className="text-sm block mt-2 font-normal text-gray-400">Passionné par la création d'applications web innovantes</span>
             </span>
           </h1>
