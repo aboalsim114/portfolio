@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import { FaRobot, FaFileDownload } from 'react-icons/fa';
+import { FaRobot, FaFileDownload, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
 import { personalData } from "@/utils/data/personal-data";
 
@@ -11,12 +11,26 @@ function Chatbot() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Bonjour ! Je suis l\'assistant virtuel de Sami. Je peux vous aider à en savoir plus sur ses compétences ou vous pouvez télécharger son CV en cliquant sur le bouton ci-dessous.',
-      showCVButton: true
+      content: 'Bonjour ! Je suis l\'assistant virtuel de Sami. Je peux vous aider à en savoir plus sur ses compétences, vous montrer ses profils professionnels ou vous pouvez télécharger son CV.',
+      showCVButton: true,
+      showSocialLinks: true
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const socialLinks = [
+    {
+      name: 'GitHub',
+      url: personalData.github,
+      icon: <FaGithub size={12} />
+    },
+    {
+      name: 'LinkedIn',
+      url: personalData.linkedIn,
+      icon: <FaLinkedin size={12} />
+    }
+  ];
 
   const handleDownloadCV = () => {
     window.open(personalData.resume, '_blank');
@@ -35,9 +49,14 @@ function Chatbot() {
     setInputMessage('');
     setIsLoading(true);
 
-    // Vérifier si le message contient une demande de CV
+    // Vérifier si le message contient une demande de CV ou de profils
     const cvKeywords = ['cv', 'curriculum', 'vitae', 'resume', 'télécharger'];
+    const socialKeywords = ['github', 'linkedin', 'projets', 'profil', 'portfolio', 'réseau'];
+    
     const askingForCV = cvKeywords.some(keyword => 
+      inputMessage.toLowerCase().includes(keyword)
+    );
+    const askingForSocial = socialKeywords.some(keyword => 
       inputMessage.toLowerCase().includes(keyword)
     );
 
@@ -55,7 +74,8 @@ function Chatbot() {
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: data.response,
-        showCVButton: askingForCV
+        showCVButton: askingForCV,
+        showSocialLinks: askingForSocial
       }]);
     } catch (error) {
       console.error('Error:', error);
@@ -63,6 +83,23 @@ function Chatbot() {
       setIsLoading(false);
     }
   };
+
+  const SocialLinks = () => (
+    <div className="flex gap-2">
+      {socialLinks.map((link, index) => (
+        <a
+          key={index}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
+        >
+          {link.icon}
+          {link.name}
+        </a>
+      ))}
+    </div>
+  );
 
   return (
     <>
@@ -92,28 +129,33 @@ function Chatbot() {
           <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2 sm:space-y-3">
             {messages.map((message, index) => (
               <div key={index} className="space-y-2">
-                <div
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
-                      message.role === 'user'
-                        ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
-                        : 'bg-[#1b2c68a0] text-white'
-                    }`}
-                  >
+                <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] rounded-lg p-2 sm:p-2.5 text-xs sm:text-sm ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-pink-500 to-violet-600 text-white'
+                      : 'bg-[#1b2c68a0] text-white'
+                  }`}>
                     {message.content}
                   </div>
                 </div>
-                {message.showCVButton && message.role === 'assistant' && (
-                  <div className="flex justify-start">
-                    <button
-                      onClick={handleDownloadCV}
-                      className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
-                    >
-                      <FaFileDownload size={12} />
-                      Télécharger le CV
-                    </button>
+                {message.role === 'assistant' && (
+                  <div className="flex flex-col gap-2">
+                    {message.showCVButton && (
+                      <div className="flex justify-start">
+                        <button
+                          onClick={handleDownloadCV}
+                          className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-violet-600 text-white px-3 py-1.5 rounded-lg text-xs hover:opacity-90 transition-opacity"
+                        >
+                          <FaFileDownload size={12} />
+                          Télécharger le CV
+                        </button>
+                      </div>
+                    )}
+                    {message.showSocialLinks && (
+                      <div className="flex justify-start">
+                        <SocialLinks />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
