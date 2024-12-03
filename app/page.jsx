@@ -8,6 +8,7 @@ import FAQSection from "./components/homepage/faq";
 import HeroSection from "./components/homepage/hero-section";
 import ProjectSection from "./components/homepage/projects";
 import SkillSection from "./components/homepage/skills";
+import Certifications from "./components/homepage/certifications";
 
 async function getData() {
   try {
@@ -37,9 +38,9 @@ export default async function Home() {
       <SkillSection />
       <EducationSection />
       <ProjectSection />
-    
+      <Certifications />
       <FAQSection />
-     
+    
     </>
   );
 } 
