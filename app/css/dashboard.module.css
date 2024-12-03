@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Layout principal */
+  .dashboardLayout {
+    @apply min-h-screen bg-gradient-to-br from-[#0d1224] via-[#0f1629] to-[#131c3b];
+  }
+
+  /* Sidebar */
+  .dashboardSidebar {
+    @apply fixed top-0 left-0 h-full w-72 bg-[#1a1443]/50 backdrop-blur-xl border-r border-gray-800/50;
+  }
+
+  .sidebarLink {
+    @apply flex items-center gap-3 p-3 text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-300;
+  }
+
+  .active {
+    @apply bg-gradient-to-r from-pink-500/20 to-violet-600/20 text-white;
+  }
+
+  /* ... reste du code ... */
+} 

@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Layout principal */
+  .dashboard-layout {
+    @apply min-h-screen bg-gradient-to-br from-[#0d1224] via-[#0f1629] to-[#131c3b];
+  }
+
+  /* Sidebar */
+  .dashboard-sidebar {
+    @apply fixed top-0 left-0 h-full w-72 bg-[#1a1443]/50 backdrop-blur-xl border-r border-gray-800/50;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 p-3 text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-300;
+  }
+
+  .sidebar-link.active {
+    @apply bg-gradient-to-r from-pink-500/20 to-violet-600/20 text-white;
+  }
+
+  .sidebar-icon {
+    @apply p-2 rounded-lg bg-gradient-to-br from-pink-500/20 to-violet-500/20;
+  }
+
+  /* Header */
+  .dashboard-header {
+    @apply sticky top-0 z-40 bg-[#1a1443]/30 backdrop-blur-xl border-b border-gray-800/50;
+  }
+
+  /* Cards */
+  .dashboard-card {
+    @apply bg-[#1a1443]/50 backdrop-blur-xl p-6 rounded-xl border border-gray-800/50 hover:border-gray-700/50 transition-all duration-300;
+  }
+
+  .stat-card {
+    @apply relative overflow-hidden bg-gradient-to-br from-[#1a1443]/80 to-[#1a1443]/40 p-6 rounded-2xl border border-gray-800/50 hover:border-gray-700/50 transition-all duration-300;
+  }
+
+  .stat-card::before {
+    @apply content-[''] absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 transition-opacity duration-300;
+  }
+
+  .stat-card:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Formulaires */
+  .dashboard-input {
+    @apply w-full p-3 rounded-lg bg-[#0d1224] border border-gray-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all duration-300;
+  }
+
+  .dashboard-textarea {
+    @apply w-full p-3 rounded-lg bg-[#0d1224] border border-gray-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all duration-300;
+  }
+
+  .dashboard-select {
+    @apply w-full p-3 rounded-lg bg-[#0d1224] border border-gray-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all duration-300;
+  }
+
+  /* Boutons */
+  .dashboard-btn {
+    @apply px-4 py-2 rounded-lg transition-all duration-300 flex items-center gap-2 font-medium;
+  }
+
+  .btn-primary {
+    @apply dashboard-btn bg-gradient-to-r from-pink-500 to-violet-600 hover:opacity-90 text-white;
+  }
+
+  .btn-secondary {
+    @apply dashboard-btn bg-gray-600 hover:bg-gray-700 text-white;
+  }
+
+  .btn-danger {
+    @apply dashboard-btn bg-red-500 hover:bg-red-600 text-white;
+  }
+
+  /* Tableaux */
+  .dashboard-table {
+    @apply w-full border-collapse;
+  }
+
+  .dashboard-table th {
+    @apply p-4 text-left text-sm font-medium text-gray-400 border-b border-gray-800;
+  }
+
+  .dashboard-table td {
+    @apply p-4 border-b border-gray-800;
+  }
+
+  .dashboard-table tr:hover {
+    @apply bg-white/5;
+  }
+
+  /* Animations */
+  .fade-in {
+    @apply animate-[fadeIn_0.3s_ease-in-out];
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+} 

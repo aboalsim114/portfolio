@@ -14,7 +14,12 @@ function Footer() {
           <p className="text-sm">
             © Developer Portfolio by <Link target="_blank" href="https://www.linkedin.com/in/abu/" className="text-[#16f2b3]">ABDULHALIM SAMI</Link>
           </p>
-       
+          <Link 
+            href="/admin/login" 
+            className="text-xs text-gray-500 hover:text-gray-400 transition-colors"
+          >
+            Admin
+          </Link>
         </div>
       </div>
     </div >
