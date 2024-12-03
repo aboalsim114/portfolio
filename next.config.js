@@ -1,6 +1,10 @@
-const path = require('path')
- 
-module.exports = {
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
@@ -22,4 +26,6 @@ module.exports = {
       'dev-to-uploads.s3.amazonaws.com'
     ],
   },
-}
+};
+
+export default nextConfig;
