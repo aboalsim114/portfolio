@@ -2,15 +2,6 @@ import { NextResponse } from 'next/server';
 import { zoomConfig } from '@/utils/zoom-config';
 import nodemailer from 'nodemailer';
 
-// Configurer le transporteur email
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_ADDRESS,
-    pass: process.env.EMAIL_APP_PASSWORD // Mot de passe d'application Gmail
-  }
-});
-
 export async function POST(request) {
   try {
     const { date, time, email, subject, message } = await request.json();
@@ -23,12 +14,38 @@ export async function POST(request) {
       );
     }
 
+    // Vérification des credentials email
+    if (!process.env.EMAIL_ADDRESS || !process.env.EMAIL_APP_PASSWORD) {
+      throw new Error('Configuration email manquante');
+    }
+
+    // Création du transporteur avec configuration sécurisée
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // utilise SSL
+      auth: {
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_APP_PASSWORD
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    // Vérification de la connexion SMTP
+    try {
+      await transporter.verify();
+      console.log('Connexion SMTP vérifiée avec succès');
+    } catch (error) {
+      console.error('Erreur de connexion SMTP:', error);
+      throw new Error('Erreur de configuration email');
+    }
+
     const meetingTime = new Date(`${date}T${time}`);
-    console.log('Meeting time:', meetingTime);
     
     // Obtenir le token Zoom
     const token = await getZoomToken();
-    console.log('Token Zoom obtenu');
     
     // Créer la réunion Zoom
     const zoomRequestBody = {
@@ -57,83 +74,93 @@ export async function POST(request) {
 
     const meeting = await zoomResponse.json();
 
-    // Email pour le client
-    await transporter.sendMail({
-      from: process.env.EMAIL_ADDRESS,
-      to: email,
-      subject: `Confirmation de rendez-vous : ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Confirmation de rendez-vous</h2>
-          <p>Bonjour,</p>
-          <p>Votre rendez-vous avec Sami Abdulhalim est confirmé pour le 
-            <strong>${meetingTime.toLocaleDateString('fr-FR', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}</strong> 
-            à <strong>${time}</strong>.
-          </p>
-          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-            <h3 style="margin-top: 0; color: #333;">Détails de l'entretien</h3>
-            <p><strong>Sujet :</strong> ${subject}</p>
-            <p><strong>Votre message :</strong><br>${message}</p>
+    // Envoi des emails avec gestion d'erreur explicite
+    try {
+      await transporter.sendMail({
+        from: {
+          name: 'Sami Abdulhalim',
+          address: process.env.EMAIL_ADDRESS
+        },
+        to: email,
+        subject: `Confirmation de rendez-vous : ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Confirmation de rendez-vous</h2>
+            <p>Bonjour,</p>
+            <p>Votre rendez-vous avec Sami Abdulhalim est confirmé pour le 
+              <strong>${meetingTime.toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}</strong> 
+              à <strong>${time}</strong>.
+            </p>
+            <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+              <h3 style="margin-top: 0; color: #333;">Détails de l'entretien</h3>
+              <p><strong>Sujet :</strong> ${subject}</p>
+              <p><strong>Votre message :</strong><br>${message}</p>
+            </div>
+            <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
+              <p style="margin: 0;">Pour rejoindre la réunion, cliquez sur ce lien :</p>
+              <a href="${meeting.join_url}" 
+                 style="display: inline-block; margin-top: 10px; padding: 10px 20px; 
+                        background-color: #2D8CFF; color: white; text-decoration: none; 
+                        border-radius: 5px;">
+                Rejoindre la réunion Zoom
+              </a>
+            </div>
+            <p>À bientôt !</p>
+            <p><strong>Sami Abdulhalim</strong></p>
           </div>
-          <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
-            <p style="margin: 0;">Pour rejoindre la réunion, cliquez sur ce lien :</p>
-            <a href="${meeting.join_url}" 
-               style="display: inline-block; margin-top: 10px; padding: 10px 20px; 
-                      background-color: #2D8CFF; color: white; text-decoration: none; 
-                      border-radius: 5px;">
-              Rejoindre la réunion Zoom
-            </a>
-          </div>
-          <p>À bientôt !</p>
-          <p><strong>Sami Abdulhalim</strong></p>
-        </div>
-      `
-    });
+        `
+      });
 
-    // Email de notification pour vous
-    await transporter.sendMail({
-      from: process.env.EMAIL_ADDRESS,
-      to: process.env.EMAIL_ADDRESS,
-      subject: `Nouveau rendez-vous : ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Nouveau rendez-vous</h2>
-          <p>Un nouveau rendez-vous a été programmé :</p>
-          <ul style="list-style: none; padding: 0;">
-            <li><strong>Date :</strong> ${meetingTime.toLocaleDateString('fr-FR', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}</li>
-            <li><strong>Heure :</strong> ${time}</li>
-            <li><strong>Email du participant :</strong> ${email}</li>
-            <li><strong>Sujet :</strong> ${subject}</li>
-          </ul>
-          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-            <h3 style="margin-top: 0; color: #333;">Message du participant</h3>
-            <p style="white-space: pre-wrap;">${message}</p>
+      await transporter.sendMail({
+        from: {
+          name: 'Système de Réservation',
+          address: process.env.EMAIL_ADDRESS
+        },
+        to: process.env.EMAIL_ADDRESS,
+        subject: `Nouveau rendez-vous : ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #333;">Nouveau rendez-vous</h2>
+            <p>Un nouveau rendez-vous a été programmé :</p>
+            <ul style="list-style: none; padding: 0;">
+              <li><strong>Date :</strong> ${meetingTime.toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}</li>
+              <li><strong>Heure :</strong> ${time}</li>
+              <li><strong>Email du participant :</strong> ${email}</li>
+              <li><strong>Sujet :</strong> ${subject}</li>
+            </ul>
+            <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+              <h3 style="margin-top: 0; color: #333;">Message du participant</h3>
+              <p style="white-space: pre-wrap;">${message}</p>
+            </div>
+            <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
+              <p style="margin: 0;">Lien de la réunion :</p>
+              <a href="${meeting.start_url}" 
+                 style="display: inline-block; margin-top: 10px; padding: 10px 20px; 
+                        background-color: #2D8CFF; color: white; text-decoration: none; 
+                        border-radius: 5px;">
+                Démarrer la réunion Zoom
+              </a>
+            </div>
+            <p style="color: #666; font-size: 14px;">
+              * Ceci est une notification automatique. N'oubliez pas d'ajouter ce rendez-vous à votre calendrier.
+            </p>
           </div>
-          <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border-radius: 5px;">
-            <p style="margin: 0;">Lien de la réunion :</p>
-            <a href="${meeting.start_url}" 
-               style="display: inline-block; margin-top: 10px; padding: 10px 20px; 
-                      background-color: #2D8CFF; color: white; text-decoration: none; 
-                      border-radius: 5px;">
-              Démarrer la réunion Zoom
-            </a>
-          </div>
-          <p style="color: #666; font-size: 14px;">
-            * Ceci est une notification automatique. N'oubliez pas d'ajouter ce rendez-vous à votre calendrier.
-          </p>
-        </div>
-      `
-    });
+        `
+      });
+    } catch (emailError) {
+      console.error('Erreur envoi email:', emailError);
+      throw new Error('Erreur lors de l\'envoi des emails');
+    }
 
     return NextResponse.json({
       success: true,
@@ -147,7 +174,11 @@ export async function POST(request) {
   } catch (error) {
     console.error('Erreur détaillée:', error);
     return NextResponse.json(
-      { success: false, error: error.message || "Une erreur est survenue" },
+      { 
+        success: false, 
+        error: error.message || "Une erreur est survenue",
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
