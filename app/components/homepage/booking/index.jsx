@@ -136,9 +136,9 @@ function BookingSection() {
                     <select
                       value={selectedTime}
                       onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-violet-500 text-white transition-all duration-300 hover:bg-white/10"
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-violet-500 text-white transition-all duration-300 hover:bg-white/10 [&>option]:bg-[#0d1224] [&>option]:text-white"
                     >
-                      <option value="">Choisir un horaire</option>
+                      <option value="" className="text-gray-400">Choisir un horaire</option>
                       {availableTimeSlots.map(time => (
                         <option key={time} value={time}>{time}</option>
                       ))}
