@@ -54,11 +54,11 @@ function Home() {
               <span className="h-1.5 w-1.5 bg-[#16f2b3] rounded-full animate-pulse"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              À la recherche d'une alternance
+              À la recherche d&apos;une alternance
             </h3>
             <p className="text-gray-400">
-              Actuellement en Master Architecture Logicielle à l'ESGI, je suis à l'écoute 
-              d'opportunités d'alternance pour mettre en pratique mes compétences 
+              Actuellement en Master Architecture Logicielle à l&apos;ESGI, je suis à l&apos;écoute 
+              d&apos;opportunités d&apos;alternance pour mettre en pratique mes compétences 
             </p>
           </div>
         </div>
