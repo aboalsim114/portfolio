@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaVideo, FaCheck } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { FaCalendarAlt, FaClock, FaVideo } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-toastify';
@@ -72,25 +72,10 @@ function BookingSection() {
   };
 
   return (
-    <div id="booking" className="relative min-h-screen flex items-center justify-center py-20 overflow-hidden">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[#0d1224]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-pink-500/10 animate-gradient" />
-        <div className="absolute inset-0 backdrop-blur-[118px]" />
-        
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-white rounded-full animate-float"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                opacity: Math.random() * 0.5 + 0.25
-              }}
-            />
-          ))}
+    <div id="booking" className="relative z-50 border-t my-12 lg:my-24 border-[#353951]">
+      <div className="flex justify-center -translate-y-[1px]">
+        <div className="w-3/4">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent w-full" />
         </div>
       </div>
 
@@ -101,16 +86,9 @@ function BookingSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center mb-16 relative"
         >
-          <span className="inline-block text-sm font-medium text-pink-500 mb-4 px-3 py-1 bg-pink-500/10 rounded-full">
-            Disponible pour une alternance
-          </span>
-          <h2 className="text-4xl md:text-6xl font-bold mb-6">
-            <span className="inline-block bg-gradient-to-r from-pink-500 via-violet-500 to-[#16f2b3] bg-clip-text text-transparent">
-              Planifiez votre
-            </span>
-            <br />
-            <span className="inline-block text-white mt-2">
-              Rendez-vous
+          <h2 className="text-4xl font-bold">
+            <span className="bg-gradient-to-r from-[#16f2b3] to-emerald-400 bg-clip-text text-transparent">
+              Prendre rendez-vous
             </span>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -124,9 +102,7 @@ function BookingSection() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           className="relative"
         >
-          <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl">
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-pink-500/20 via-violet-500/20 to-[#16f2b3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            
+          <div className="relative bg-[#0d1224] rounded-xl border border-[#353a52] shadow-lg">
             <div className="relative p-8 md:p-12">
               <form onSubmit={handleSubmit} className="space-y-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
