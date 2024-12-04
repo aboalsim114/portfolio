@@ -23,11 +23,22 @@ const nextConfig = {
       'dev-to-uploads.s3.amazonaws.com'
     ],
   },
-  experimental: {
-    optimizeCss: true,
-  },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
+  },
+  async redirects() {
+    return [
+      {
+        source: '/404',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/500',
+        destination: '/',
+        permanent: true,
+      },
+    ]
   }
 }
 
