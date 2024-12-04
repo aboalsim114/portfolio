@@ -8,7 +8,7 @@ import { personalData } from "@/utils/data/personal-data";
 // Import dynamique des composants avec loading fallback
 const HeroSection = dynamic(() => import('./components/homepage/hero-section'), {
   ssr: false,
-  loading: () => <div>Chargement...</div>
+  loading: () => <div className="animate-pulse">Chargement...</div>
 });
 
 const AboutSection = dynamic(() => import('./components/homepage/about'));
@@ -19,32 +19,19 @@ const ProjectSection = dynamic(() => import('./components/homepage/projects'));
 const Certifications = dynamic(() => import('./components/homepage/certifications'));
 const BookingSection = dynamic(() => import('./components/homepage/booking'));
 
-function Home() {
-  const [isClient, setIsClient] = useState(false);
-  const [blogs, setBlogs] = useState([]);
+export default function Home() {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    async function fetchData() {
-      try {
-        const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`);
-        if (!res.ok) {
-          setBlogs([]);
-          return;
-        }
-        const data = await res.json();
-        const filtered = data.filter((item) => item?.cover_image).sort(() => Math.random() - 0.5);
-        setBlogs(filtered);
-      } catch (error) {
-        console.error('Error fetching blog data:', error);
-        setBlogs([]);
-      }
-    }
-    fetchData();
+    setMounted(true);
   }, []);
 
-  if (!isClient) {
-    return null; // ou un loader
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -83,6 +70,4 @@ function Home() {
       <BookingSection />
     </>
   );
-}
-
-export default Home; 
+} 
