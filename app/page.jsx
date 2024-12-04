@@ -40,7 +40,7 @@ export default async function Home() {
       <EducationSection />
       <ProjectSection />
       <Certifications />
-      <FAQSection />
+     
       <BookingSection />
       
     </>
