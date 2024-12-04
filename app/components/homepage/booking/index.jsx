@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaVideo } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaVideo, FaCheckCircle } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-toastify';
@@ -17,6 +17,11 @@ function BookingSection() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  const [verificationStep, setVerificationStep] = useState('initial'); // 'initial', 'pending', 'verified'
+  const [verificationCode, setVerificationCode] = useState('');
+  const [sentCode, setSentCode] = useState('');
+  const [codeAttempts, setCodeAttempts] = useState(0);
+  const [lastCodeSentTime, setLastCodeSentTime] = useState(null);
 
   useEffect(() => {
     async function fetchAvailabilities() {
@@ -28,8 +33,65 @@ function BookingSection() {
     fetchAvailabilities();
   }, [selectedDate]);
 
+  const sendVerificationCode = async () => {
+    if (!email) {
+      toast.error('Veuillez entrer une adresse email');
+      return;
+    }
+
+    // Vérifier le délai entre les envois
+    if (lastCodeSentTime && Date.now() - lastCodeSentTime < 60000) {
+      toast.error('Veuillez attendre 1 minute avant de demander un nouveau code');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSentCode(data.code);
+        setVerificationStep('pending');
+        setLastCodeSentTime(Date.now());
+        toast.success('Code de vérification envoyé !');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Erreur lors de l\'envoi du code');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyCode = () => {
+    if (codeAttempts >= 3) {
+      toast.error('Trop de tentatives. Veuillez réessayer plus tard');
+      return;
+    }
+
+    if (verificationCode === sentCode) {
+      setVerificationStep('verified');
+      toast.success('Email vérifié avec succès !');
+    } else {
+      setCodeAttempts(prev => prev + 1);
+      toast.error('Code incorrect');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (verificationStep !== 'verified') {
+      toast.error('Veuillez vérifier votre email avant de continuer');
+      return;
+    }
+    
     if (!selectedDate || !selectedTime) {
       toast.error('Veuillez sélectionner une date et une heure');
       return;
@@ -154,14 +216,63 @@ function BookingSection() {
                       <MdEmail className="inline-block mr-2 text-[#16f2b3] group-hover:scale-110 transition-transform" />
                       Email
                     </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-[#16f2b3] text-white transition-all duration-300 hover:bg-white/10"
-                      placeholder="votre@email.com"
-                    />
+                    <div className="flex flex-col gap-2">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-[#16f2b3] text-white transition-all duration-300 hover:bg-white/10"
+                        placeholder="votre@email.com"
+                      />
+                      
+                      {verificationStep === 'initial' && email && (
+                        <motion.button
+                          type="button"
+                          onClick={sendVerificationCode}
+                          disabled={isLoading}
+                          className="self-end px-4 py-2 rounded-lg bg-[#16f2b3]/20 text-[#16f2b3] hover:bg-[#16f2b3]/30 transition-colors"
+                        >
+                          Vérifier l'email
+                        </motion.button>
+                      )}
+
+                      {verificationStep === 'pending' && (
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value)}
+                            placeholder="Code de vérification"
+                            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-[#16f2b3] text-white"
+                          />
+                          <div className="flex justify-between">
+                            <button
+                              type="button"
+                              onClick={verifyCode}
+                              className="px-4 py-2 rounded-lg bg-[#16f2b3]/20 text-[#16f2b3] hover:bg-[#16f2b3]/30 transition-colors"
+                            >
+                              Vérifier le code
+                            </button>
+                            <button
+                              type="button"
+                              onClick={sendVerificationCode}
+                              disabled={lastCodeSentTime && Date.now() - lastCodeSentTime < 60000}
+                              className="px-4 py-2 rounded-lg bg-violet-500/20 text-violet-500 hover:bg-violet-500/30 transition-colors disabled:opacity-50"
+                            >
+                              Renvoyer le code
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {verificationStep === 'verified' && (
+                        <div className="flex items-center gap-2 text-[#16f2b3]">
+                          <FaCheckCircle />
+                          <span>Email vérifié</span>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 </div>
 
