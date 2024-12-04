@@ -74,7 +74,7 @@ function HeroSection() {
               <span className="text-[#16f2b3]">
                 <span ref={typedRef}></span>
               </span>
-              <span className="text-sm block mt-2 font-normal text-gray-400">Passionné par la création d'applications web innovantes</span>
+              <span className="text-sm block mt-2 font-normal text-gray-400">Passionné par la création d'applications web </span>
             </span>
           </h1>
 
