@@ -9,6 +9,7 @@ import HeroSection from "./components/homepage/hero-section";
 import ProjectSection from "./components/homepage/projects";
 import SkillSection from "./components/homepage/skills";
 import Certifications from "./components/homepage/certifications";
+import BookingSection from "./components/homepage/booking";
 
 async function getData() {
   try {
@@ -40,7 +41,8 @@ export default async function Home() {
       <ProjectSection />
       <Certifications />
       <FAQSection />
-    
+      <BookingSection />
+      
     </>
   );
 } 
