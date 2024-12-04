@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaVideo } from 'react-icons/fa';
-import { personalData } from '@/utils/data/personal-data';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaCalendarAlt, FaClock, FaVideo, FaCheck } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from 'react-toastify';
@@ -15,6 +14,8 @@ function BookingSection() {
   const [selectedTime, setSelectedTime] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 
   useEffect(() => {
@@ -44,7 +45,9 @@ function BookingSection() {
         body: JSON.stringify({
           date: selectedDate.toISOString().split('T')[0],
           time: selectedTime,
-          email: email
+          email: email,
+          subject: subject,
+          message: message
         })
       });
 
@@ -56,6 +59,8 @@ function BookingSection() {
         setSelectedDate(null);
         setSelectedTime('');
         setEmail('');
+        setSubject('');
+        setMessage('');
       } else {
         throw new Error(data.error || 'Une erreur est survenue');
       }
@@ -67,91 +72,189 @@ function BookingSection() {
   };
 
   return (
-    <div id="booking" className="relative z-50 border-t my-12 lg:my-24 border-[#353951]">
-      <div className="flex justify-center -translate-y-[1px]">
-        <div className="w-3/4">
-          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent w-full" />
+    <div id="booking" className="relative min-h-screen flex items-center justify-center py-20 overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[#0d1224]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-pink-500/10 animate-gradient" />
+        <div className="absolute inset-0 backdrop-blur-[118px]" />
+        
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white rounded-full animate-float"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                opacity: Math.random() * 0.5 + 0.25
+              }}
+            />
+          ))}
         </div>
       </div>
 
-      <div className="text-center mb-16">
+      <div className="relative w-full max-w-6xl mx-auto px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16 relative"
+        >
+          <span className="inline-block text-sm font-medium text-pink-500 mb-4 px-3 py-1 bg-pink-500/10 rounded-full">
+            Disponible pour une alternance
+          </span>
+          <h2 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="inline-block bg-gradient-to-r from-pink-500 via-violet-500 to-[#16f2b3] bg-clip-text text-transparent">
+              Planifiez votre
+            </span>
+            <br />
+            <span className="inline-block text-white mt-2">
+              Rendez-vous
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Discutons de vos projets et explorons ensemble les possibilités de collaboration pour créer quelque chose d'extraordinaire.
+          </p>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-4 bg-gradient-to-r from-[#1b2c68a0] to-[#10172d] px-8 py-4 rounded-xl border border-[#353a52]"
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="relative"
         >
-          <FaVideo className="text-[#16f2b3] text-2xl" />
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#16f2b3] to-emerald-400 bg-clip-text text-transparent">
-            Prendre rendez-vous
-          </h2>
-        </motion.div>
-      </div>
+          <div className="relative bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl">
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-pink-500/20 via-violet-500/20 to-[#16f2b3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative p-8 md:p-12">
+              <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <motion.div 
+                    className="space-y-4 group"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <label className="block text-lg font-medium text-white/90">
+                      <FaCalendarAlt className="inline-block mr-2 text-pink-500 group-hover:scale-110 transition-transform" />
+                      Date
+                    </label>
+                    <DatePicker
+                      selected={selectedDate}
+                      onChange={date => setSelectedDate(date)}
+                      minDate={new Date()}
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-pink-500 text-white transition-all duration-300 hover:bg-white/10"
+                      placeholderText="Sélectionnez une date"
+                    />
+                  </motion.div>
 
-      <div className="max-w-3xl mx-auto px-4">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-white flex items-center gap-2">
-                <FaCalendarAlt className="text-[#16f2b3]" />
-                Date du rendez-vous
-              </label>
-              <DatePicker
-                selected={selectedDate}
-                onChange={date => setSelectedDate(date)}
-                minDate={new Date()}
-                className="w-full p-3 rounded-lg bg-[#10172d] border border-[#353a52] focus:border-[#16f2b3] text-white"
-                placeholderText="Sélectionnez une date"
-              />
-            </div>
+                  <motion.div 
+                    className="space-y-4 group"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <label className="block text-lg font-medium text-white/90">
+                      <FaClock className="inline-block mr-2 text-violet-500 group-hover:scale-110 transition-transform" />
+                      Heure
+                    </label>
+                    <select
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-violet-500 text-white transition-all duration-300 hover:bg-white/10"
+                    >
+                      <option value="">Choisir un horaire</option>
+                      {availableTimeSlots.map(time => (
+                        <option key={time} value={time}>{time}</option>
+                      ))}
+                    </select>
+                  </motion.div>
 
-            <div className="space-y-2">
-              <label className="text-white flex items-center gap-2">
-                <FaClock className="text-[#16f2b3]" />
-                Heure du rendez-vous
-              </label>
-              <select
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                className="w-full p-3 rounded-lg bg-[#10172d] border border-[#353a52] focus:border-[#16f2b3] text-white"
-              >
-                <option value="">Sélectionnez une heure</option>
-                {availableTimeSlots.map(time => (
-                  <option key={time} value={time}>{time}</option>
-                ))}
-              </select>
-            </div>
+                  <motion.div 
+                    className="space-y-4 group"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <label className="block text-lg font-medium text-white/90">
+                      <MdEmail className="inline-block mr-2 text-[#16f2b3] group-hover:scale-110 transition-transform" />
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-[#16f2b3] text-white transition-all duration-300 hover:bg-white/10"
+                      placeholder="votre@email.com"
+                    />
+                  </motion.div>
+                </div>
 
-            <div className="space-y-2">
-              <label className="text-white flex items-center gap-2">
-                <MdEmail className="text-[#16f2b3]" />
-                Votre email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full p-3 rounded-lg bg-[#10172d] border border-[#353a52] focus:border-[#16f2b3] text-white"
-                placeholder="Entrez votre email"
-              />
+                <div className="space-y-6">
+                  <motion.div 
+                    className="space-y-4 group"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <label className="block text-lg font-medium text-white/90">
+                      <span className="inline-block mr-2 text-pink-500 text-xl">✦</span>
+                      Sujet de l'entretien
+                    </label>
+                    <input
+                      type="text"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      required
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-pink-500 text-white transition-all duration-300 hover:bg-white/10"
+                      placeholder="Ex: Discussion sur une opportunité d'alternance"
+                    />
+                  </motion.div>
+
+                  <motion.div 
+                    className="space-y-4 group"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <label className="block text-lg font-medium text-white/90">
+                      <span className="inline-block mr-2 text-violet-500 text-xl">✦</span>
+                      Message
+                    </label>
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
+                      rows={4}
+                      className="w-full p-4 rounded-xl bg-white/5 border border-white/10 focus:border-violet-500 text-white transition-all duration-300 hover:bg-white/10 resize-none"
+                      placeholder="Décrivez brièvement l'objectif de notre entretien..."
+                    />
+                  </motion.div>
+                </div>
+
+                <div className="flex justify-center pt-8">
+                  <motion.button
+                    type="submit"
+                    disabled={isLoading}
+                    className="group relative overflow-hidden px-12 py-4 rounded-full bg-gradient-to-r from-pink-500 via-violet-500 to-[#16f2b3] text-white font-medium text-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-500 via-violet-500 to-[#16f2b3] group-hover:translate-x-full transition-transform duration-500" />
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#16f2b3] via-violet-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <span className="relative flex items-center gap-3">
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-6 w-6 border-4 border-white/60 border-t-white" />
+                      ) : (
+                        <>
+                          <span>Réserver maintenant</span>
+                          <FaVideo className="text-xl group-hover:rotate-12 transition-transform" />
+                        </>
+                      )}
+                    </span>
+                  </motion.button>
+                </div>
+              </form>
             </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <span>Envoi en cours...</span>
-            ) : (
-              <>
-                <span>Demander un rendez-vous</span>
-                <FaVideo />
-              </>
-            )}
-          </button>
-        </form>
+        </motion.div>
       </div>
     </div>
   );
