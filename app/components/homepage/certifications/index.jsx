@@ -4,16 +4,53 @@ import Image from "next/image";
 import Link from "next/link";
 import { certifications } from "@/utils/data/certifications";
 import { FaExternalLinkAlt, FaCalendarAlt, FaIdBadge, FaCertificate, FaEye } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from 'react';
 
 function CertificationCard({ cert }) {
   const [showPreview, setShowPreview] = useState(false);
 
+  // Variantes d'animation pour les boutons
+  const buttonVariants = {
+    hover: { 
+      scale: 1.02,
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    },
+    tap: { scale: 0.98 }
+  };
+
+  // Variantes d'animation pour le preview
+  const previewVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 20,
+      scale: 0.95
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 200
+      }
+    },
+    exit: { 
+      opacity: 0,
+      y: -20,
+      scale: 0.95,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
       className="bg-[#10172d] rounded-xl overflow-hidden group relative border border-[#353a52] hover:border-[#16f2b3] transition-all duration-500"
     >
       {/* Effet de brillance au survol */}
@@ -52,51 +89,82 @@ function CertificationCard({ cert }) {
         {/* Boutons d'action */}
         <div className="flex gap-4 mb-8">
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
             onClick={() => setShowPreview(!showPreview)}
             className="flex-1 flex items-center justify-center gap-2 text-[#16f2b3] hover:text-white transition-colors group/preview bg-[#10172d]/50 p-4 rounded-xl border border-[#353a52] hover:border-[#16f2b3]/30"
           >
-            <FaEye size={16} className="transition-transform group-hover/preview:scale-110" />
+            <motion.div
+              animate={showPreview ? { rotate: 180 } : { rotate: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaEye size={16} className="transition-transform group-hover/preview:scale-110" />
+            </motion.div>
             <span className="font-medium">{showPreview ? 'Masquer l\'aperçu' : 'Voir l\'aperçu'}</span>
           </motion.button>
 
-          <motion.div whileHover={{ scale: 1.02 }} className="flex-1">
+          <motion.div
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+            className="flex-1"
+          >
             <Link
               href={cert.credentialUrl}
               target="_blank"
               className="w-full flex items-center justify-center gap-2 text-[#16f2b3] hover:text-white transition-colors group/link bg-[#10172d]/50 p-4 rounded-xl border border-[#353a52] hover:border-[#16f2b3]/30"
             >
               <span className="font-medium">Voir le certificat</span>
-              <FaExternalLinkAlt size={12} className="transform group-hover/link:translate-x-1 transition-transform" />
+              <motion.div
+                whileHover={{ x: 3 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                <FaExternalLinkAlt size={12} />
+              </motion.div>
             </Link>
           </motion.div>
         </div>
 
-        {/* Preview conditionnel */}
-        {showPreview && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="relative mb-8 group/preview"
-          >
-            <div className="aspect-[1.414/1] w-full rounded-xl overflow-hidden border border-[#353a52] group-hover:border-[#16f2b3]/30 transition-all duration-300">
-              <div className="relative w-full h-full bg-gradient-to-b from-[#1b2c68a0]/30 to-[#10172d]/30">
-                <iframe
-                  src={cert.credentialUrl}
-                  title={`Aperçu du certificat ${cert.title}`}
-                  className="w-full h-full"
-                  loading="lazy"
-                />
-                
-                {/* Badge "Aperçu" */}
-                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-[#16f2b3]/10 border border-[#16f2b3]/20 backdrop-blur-sm">
-                  <span className="text-sm font-medium text-[#16f2b3]">Aperçu</span>
-                </div>
+        {/* Preview conditionnel avec AnimatePresence */}
+        <AnimatePresence mode="wait">
+          {showPreview && (
+            <motion.div
+              key="preview"
+              variants={previewVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="relative mb-8 group/preview"
+            >
+              <div className="aspect-[1.414/1] w-full rounded-xl overflow-hidden border border-[#353a52] group-hover:border-[#16f2b3]/30 transition-all duration-300">
+                <motion.div 
+                  className="relative w-full h-full bg-gradient-to-b from-[#1b2c68a0]/30 to-[#10172d]/30"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <iframe
+                    src={cert.credentialUrl}
+                    title={`Aperçu du certificat ${cert.title}`}
+                    className="w-full h-full"
+                    loading="lazy"
+                  />
+                  
+                  {/* Badge "Aperçu" avec animation */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-[#16f2b3]/10 border border-[#16f2b3]/20 backdrop-blur-sm"
+                  >
+                    <span className="text-sm font-medium text-[#16f2b3]">Aperçu</span>
+                  </motion.div>
+                </motion.div>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Grid des informations */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
