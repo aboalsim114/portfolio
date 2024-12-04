@@ -1,6 +1,7 @@
 const path = require('path')
- 
-module.exports = {
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
   },
@@ -22,4 +23,12 @@ module.exports = {
       'dev-to-uploads.s3.amazonaws.com'
     ],
   },
+  experimental: {
+    optimizeCss: true,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  }
 }
+
+module.exports = nextConfig

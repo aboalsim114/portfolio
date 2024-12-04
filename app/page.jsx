@@ -1,23 +1,30 @@
 "use client";
-import { personalData } from "@/utils/data/personal-data";
+
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import AboutSection from "./components/homepage/about";
-import Blog from "./components/homepage/blog";
-import ContactSection from "./components/homepage/contact";
-import EducationSection from "./components/homepage/education";
-import ExperienceSection from "./components/homepage/experience";
-import FAQSection from "./components/homepage/faq";
-import HeroSection from "./components/homepage/hero-section";
-import ProjectSection from "./components/homepage/projects";
-import SkillSection from "./components/homepage/skills";
-import Certifications from "./components/homepage/certifications";
-import BookingSection from "./components/homepage/booking";
 import { useState, useEffect } from 'react';
+import { personalData } from "@/utils/data/personal-data";
+
+// Import dynamique des composants avec loading fallback
+const HeroSection = dynamic(() => import('./components/homepage/hero-section'), {
+  ssr: false,
+  loading: () => <div>Chargement...</div>
+});
+
+const AboutSection = dynamic(() => import('./components/homepage/about'));
+const ExperienceSection = dynamic(() => import('./components/homepage/experience'));
+const SkillSection = dynamic(() => import('./components/homepage/skills'));
+const EducationSection = dynamic(() => import('./components/homepage/education'));
+const ProjectSection = dynamic(() => import('./components/homepage/projects'));
+const Certifications = dynamic(() => import('./components/homepage/certifications'));
+const BookingSection = dynamic(() => import('./components/homepage/booking'));
 
 function Home() {
+  const [isClient, setIsClient] = useState(false);
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
+    setIsClient(true);
     async function fetchData() {
       try {
         const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`);
@@ -35,6 +42,10 @@ function Home() {
     }
     fetchData();
   }, []);
+
+  if (!isClient) {
+    return null; // ou un loader
+  }
 
   return (
     <>
