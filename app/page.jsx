@@ -12,26 +12,29 @@ import ProjectSection from "./components/homepage/projects";
 import SkillSection from "./components/homepage/skills";
 import Certifications from "./components/homepage/certifications";
 import BookingSection from "./components/homepage/booking";
+import { useState, useEffect } from 'react';
 
-async function getData() {
-  try {
-    const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`);
+function Home() {
+  const [blogs, setBlogs] = useState([]);
 
-    if (!res.ok) {
-      return [];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch(`https://dev.to/api/articles?username=${personalData.devUsername}`);
+        if (!res.ok) {
+          setBlogs([]);
+          return;
+        }
+        const data = await res.json();
+        const filtered = data.filter((item) => item?.cover_image).sort(() => Math.random() - 0.5);
+        setBlogs(filtered);
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+        setBlogs([]);
+      }
     }
-
-    const data = await res.json();
-    const filtered = data.filter((item) => item?.cover_image).sort(() => Math.random() - 0.5);
-    return filtered;
-  } catch (error) {
-    console.error('Error fetching blog data:', error);
-    return [];
-  }
-}
-
-export default async function Home() {
-  const blogs = await getData();
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -69,4 +72,6 @@ export default async function Home() {
       <BookingSection />
     </>
   );
-} 
+}
+
+export default Home; 
