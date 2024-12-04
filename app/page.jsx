@@ -3,12 +3,10 @@
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { personalData } from "@/utils/data/personal-data";
 
-// Import dynamique des composants avec loading fallback
+// Import dynamique des composants avec SSR désactivé pour ceux qui utilisent document
 const HeroSection = dynamic(() => import('./components/homepage/hero-section'), {
-  ssr: false,
-  loading: () => <div className="animate-pulse">Chargement...</div>
+  ssr: false
 });
 
 const AboutSection = dynamic(() => import('./components/homepage/about'));
@@ -17,16 +15,18 @@ const SkillSection = dynamic(() => import('./components/homepage/skills'));
 const EducationSection = dynamic(() => import('./components/homepage/education'));
 const ProjectSection = dynamic(() => import('./components/homepage/projects'));
 const Certifications = dynamic(() => import('./components/homepage/certifications'));
-const BookingSection = dynamic(() => import('./components/homepage/booking'));
+const BookingSection = dynamic(() => import('./components/homepage/booking'), {
+  ssr: false
+});
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setIsClient(true);
   }, []);
 
-  if (!mounted) {
+  if (!isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-pink-500"></div>
@@ -38,36 +38,18 @@ export default function Home() {
     <>
       <HeroSection />
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        className="relative z-50 max-w-6xl mx-auto px-4 mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
       >
-        <div className="bg-gradient-to-r from-pink-500/10 to-violet-500/10 border border-pink-500/20 rounded-lg p-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
-          <div className="relative">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="inline-flex items-center justify-center px-3 py-1 text-xs font-medium bg-pink-500/20 text-pink-500 rounded-full">
-                Disponible
-              </span>
-              <span className="h-1.5 w-1.5 bg-[#16f2b3] rounded-full animate-pulse"></span>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              À la recherche d&apos;une alternance
-            </h3>
-            <p className="text-gray-400">
-              Actuellement en Master Architecture Logicielle à l&apos;ESGI, je suis à l&apos;écoute 
-              d&apos;opportunités d&apos;alternance pour mettre en pratique mes compétences 
-            </p>
-          </div>
-        </div>
+        <AboutSection />
+        <ExperienceSection />
+        <SkillSection />
+        <EducationSection />
+        <ProjectSection />
+        <Certifications />
+        <BookingSection />
       </motion.div>
-      <AboutSection />
-      <ExperienceSection />
-      <SkillSection />
-      <EducationSection />
-      <ProjectSection />
-      <Certifications />
-      <BookingSection />
     </>
   );
 } 
