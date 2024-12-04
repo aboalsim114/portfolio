@@ -214,12 +214,14 @@ function CertificationCard({ cert }) {
 function Certifications() {
   return (
     <div id="certifications" className="relative z-50 border-t my-12 lg:my-24 border-[#353951]">
+      {/* Ligne décorative supérieure */}
       <div className="flex justify-center -translate-y-[1px]">
         <div className="w-3/4">
           <div className="h-[1px] bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent w-full" />
         </div>
       </div>
 
+      {/* En-tête de section */}
       <div className="text-center mb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -233,6 +235,7 @@ function Certifications() {
         </motion.div>
       </div>
 
+      {/* Contenu des certifications */}
       <div className="max-w-7xl mx-auto px-4 space-y-8">
         {certifications.map((cert) => (
           <CertificationCard key={cert.id} cert={cert} />
