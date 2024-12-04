@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { certifications } from "@/utils/data/certifications";
-import { FaExternalLinkAlt, FaCalendarAlt, FaIdBadge, FaCertificate } from "react-icons/fa";
+import { FaExternalLinkAlt, FaCalendarAlt, FaIdBadge, FaCertificate, FaEye } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useState } from 'react';
 
 function CertificationCard({ cert }) {
+  const [showPreview, setShowPreview] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -46,6 +49,56 @@ function CertificationCard({ cert }) {
 
       {/* Contenu */}
       <div className="p-8 bg-gradient-to-b from-[#1b2c68a0]/50 to-transparent">
+        {/* Boutons d'action */}
+        <div className="flex gap-4 mb-8">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex-1 flex items-center justify-center gap-2 text-[#16f2b3] hover:text-white transition-colors group/preview bg-[#10172d]/50 p-4 rounded-xl border border-[#353a52] hover:border-[#16f2b3]/30"
+          >
+            <FaEye size={16} className="transition-transform group-hover/preview:scale-110" />
+            <span className="font-medium">{showPreview ? 'Masquer l\'aperçu' : 'Voir l\'aperçu'}</span>
+          </motion.button>
+
+          <motion.div whileHover={{ scale: 1.02 }} className="flex-1">
+            <Link
+              href={cert.credentialUrl}
+              target="_blank"
+              className="w-full flex items-center justify-center gap-2 text-[#16f2b3] hover:text-white transition-colors group/link bg-[#10172d]/50 p-4 rounded-xl border border-[#353a52] hover:border-[#16f2b3]/30"
+            >
+              <span className="font-medium">Voir le certificat</span>
+              <FaExternalLinkAlt size={12} className="transform group-hover/link:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Preview conditionnel */}
+        {showPreview && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="relative mb-8 group/preview"
+          >
+            <div className="aspect-[1.414/1] w-full rounded-xl overflow-hidden border border-[#353a52] group-hover:border-[#16f2b3]/30 transition-all duration-300">
+              <div className="relative w-full h-full bg-gradient-to-b from-[#1b2c68a0]/30 to-[#10172d]/30">
+                <iframe
+                  src={cert.credentialUrl}
+                  title={`Aperçu du certificat ${cert.title}`}
+                  className="w-full h-full"
+                  loading="lazy"
+                />
+                
+                {/* Badge "Aperçu" */}
+                <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-[#16f2b3]/10 border border-[#16f2b3]/20 backdrop-blur-sm">
+                  <span className="text-sm font-medium text-[#16f2b3]">Aperçu</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Grid des informations */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Dates */}
           {['Émission', 'Expiration'].map((type, index) => (
@@ -85,21 +138,6 @@ function CertificationCard({ cert }) {
             </p>
           </motion.div>
         </div>
-
-        {/* Bouton */}
-        <motion.div 
-          whileHover={{ scale: 1.02 }}
-          className="mt-8"
-        >
-          <Link
-            href={cert.credentialUrl}
-            target="_blank"
-            className="flex items-center justify-between text-[#16f2b3] hover:text-white transition-colors group/link bg-[#10172d]/50 p-4 rounded-xl border border-[#353a52] group-hover:border-[#16f2b3]/30"
-          >
-            <span className="font-medium">Voir le certificat</span>
-            <FaExternalLinkAlt size={12} className="transform group-hover/link:translate-x-1 transition-transform" />
-          </Link>
-        </motion.div>
       </div>
     </motion.div>
   );
