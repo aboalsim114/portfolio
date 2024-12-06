@@ -135,20 +135,8 @@ export default function Dashboard() {
       
       color: 'from-blue-600 to-cyan-600' 
     },
-    { 
-      icon: FiEye, 
-      label: 'Visites', 
-      value: dashboardStats.visits.toString(), 
-     
-      color: 'from-emerald-600 to-teal-600' 
-    },
-    { 
-      icon: FiMessageCircle, 
-      label: 'Conversations', 
-      value: dashboardStats.conversations.toString(), 
-    
-      color: 'from-amber-600 to-orange-600' 
-    },
+  
+   
   ];
 
   const recentActivities = [
