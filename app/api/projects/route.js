@@ -12,6 +12,10 @@ export const GET = async (request) => {
         id: 'desc'
       }
     });
+    
+    // Log pour déboguer
+    console.log('Nombre de projets trouvés:', projects.length);
+    
     return NextResponse.json(projects);
   } catch (error) {
     console.error('Erreur GET projects:', error);

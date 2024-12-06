@@ -12,6 +12,36 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [dashboardStats, setDashboardStats] = useState({
+    projects: 0,
+    appointments: 0,
+    visits: 0,
+    conversations: 0
+  });
+
+  const fetchDashboardStats = async () => {
+    try {
+      const projectsResponse = await fetch('/api/projects');
+      const projectsData = await projectsResponse.json();
+      
+      setDashboardStats(prev => ({
+        ...prev,
+        projects: Array.isArray(projectsData) ? projectsData.length : 0,
+        appointments: 8,
+        visits: 2400,
+        conversations: 156
+      }));
+    } catch (error) {
+      console.error('Erreur lors de la récupération des stats:', error);
+      toast.error('Erreur lors de la récupération des statistiques');
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchDashboardStats();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -70,28 +100,28 @@ export default function Dashboard() {
     { 
       icon: FiBriefcase, 
       label: 'Projets', 
-      value: '12', 
+      value: dashboardStats.projects.toString(), 
       change: '+3 ce mois', 
       color: 'from-violet-600 to-fuchsia-600' 
     },
     { 
       icon: FiMail, 
       label: 'Rendez-vous', 
-      value: '8', 
+      value: dashboardStats.appointments.toString(), 
       change: '3 à venir', 
       color: 'from-blue-600 to-cyan-600' 
     },
     { 
       icon: FiEye, 
       label: 'Visites', 
-      value: '2.4k', 
+      value: dashboardStats.visits.toString(), 
       change: '+18%', 
       color: 'from-emerald-600 to-teal-600' 
     },
     { 
       icon: FiMessageCircle, 
       label: 'Conversations', 
-      value: '156', 
+      value: dashboardStats.conversations.toString(), 
       change: '+12 /jour', 
       color: 'from-amber-600 to-orange-600' 
     },
