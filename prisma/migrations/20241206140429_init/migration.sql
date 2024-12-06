@@ -18,6 +18,7 @@ CREATE TABLE "Project" (
 CREATE TABLE "Appointment" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "client" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
     "time" TEXT NOT NULL,
     "subject" TEXT NOT NULL,
