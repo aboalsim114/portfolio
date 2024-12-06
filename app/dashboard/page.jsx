@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiHome, FiUsers, FiMail, FiLogOut, FiBriefcase, FiFileText, FiActivity, FiClock, FiGithub, FiArrowUp, FiEye, FiStar } from 'react-icons/fi';
+import { FiHome, FiUsers, FiMail, FiLogOut, FiBriefcase, FiFileText, FiActivity, FiClock, FiGithub, FiArrowUp, FiEye, FiStar, FiMessageCircle, FiCalendar } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
 export default function Dashboard() {
@@ -54,8 +54,84 @@ export default function Dashboard() {
   const menuItems = [
     { icon: FiHome, label: 'Vue Générale', id: 'home' },
     { icon: FiBriefcase, label: 'Projets', id: 'projects' },
-    { icon: FiMail, label: 'Messages', id: 'messages' },
+    { icon: FiMail, label: 'Rendez-vous', id: 'appointments' },
     { icon: FiFileText, label: 'Blog', id: 'blog' },
+    { icon: FiUsers, label: 'Chatbot', id: 'chatbot' },
+  ];
+
+  const stats = [
+    { 
+      icon: FiBriefcase, 
+      label: 'Projets', 
+      value: '12', 
+      change: '+3 ce mois', 
+      color: 'from-violet-600 to-fuchsia-600' 
+    },
+    { 
+      icon: FiMail, 
+      label: 'Rendez-vous', 
+      value: '8', 
+      change: '3 à venir', 
+      color: 'from-blue-600 to-cyan-600' 
+    },
+    { 
+      icon: FiEye, 
+      label: 'Visites', 
+      value: '2.4k', 
+      change: '+18%', 
+      color: 'from-emerald-600 to-teal-600' 
+    },
+    { 
+      icon: FiMessageCircle, 
+      label: 'Conversations', 
+      value: '156', 
+      change: '+12 /jour', 
+      color: 'from-amber-600 to-orange-600' 
+    },
+  ];
+
+  const recentActivities = [
+    { 
+      user: "Projet", 
+      action: "Nouveau projet ajouté : Application Mobile React Native", 
+      time: "Il y a 2h", 
+      icon: FiBriefcase 
+    },
+    { 
+      user: "Rendez-vous", 
+      action: "Consultation programmée avec Client A", 
+      time: "Il y a 3h", 
+      icon: FiMail 
+    },
+    { 
+      user: "Blog", 
+      action: "Nouvel article : Les avantages de Next.js", 
+      time: "Il y a 5h", 
+      icon: FiFileText 
+    },
+    { 
+      user: "Chatbot", 
+      action: "15 nouvelles conversations", 
+      time: "Il y a 1j", 
+      icon: FiMessageCircle 
+    },
+  ];
+
+  const upcomingAppointments = [
+    {
+      client: "Jean Dupont",
+      date: "23 Avril 2024",
+      time: "14:00",
+      subject: "Consultation Web",
+      status: "confirmé"
+    },
+    {
+      client: "Marie Martin",
+      date: "24 Avril 2024",
+      time: "15:30",
+      subject: "Projet Mobile",
+      status: "en attente"
+    }
   ];
 
   return (
@@ -135,12 +211,7 @@ export default function Dashboard() {
         <div className="space-y-8">
           {/* Statistiques */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: FiBriefcase, label: 'Projets', value: '8', change: '+2', color: 'from-violet-600 to-fuchsia-600' },
-              { icon: FiMail, label: 'Messages', value: '24', change: '+5', color: 'from-blue-600 to-cyan-600' },
-              { icon: FiEye, label: 'Vues', value: '1.2k', change: '+12%', color: 'from-emerald-600 to-teal-600' },
-              { icon: FiStar, label: 'Favoris', value: '36', change: '+3', color: 'from-amber-600 to-orange-600' },
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -166,41 +237,78 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Activités récentes avec design amélioré */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
-          >
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <FiClock className="text-violet-500" />
-              <span>Activités Récentes</span>
-            </h3>
-            <div className="space-y-4">
-              {[
-                { user: "Portfolio", action: "Nouveau projet ajouté : E-commerce", time: "Il y a 2h", icon: FiBriefcase },
-                { user: "Blog", action: "Nouvel article publié sur Next.js", time: "Il y a 5h", icon: FiFileText },
-                { user: "Contact", action: "Nouveau message reçu", time: "Il y a 1j", icon: FiMail },
-              ].map((activity, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ x: 5 }}
-                  className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
-                >
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20">
-                    <activity.icon className="text-violet-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <span className="font-medium text-violet-400">{activity.user}</span>
-                      {" "}{activity.action}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          {/* Grid 2 colonnes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Activités récentes */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+            >
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <FiClock className="text-violet-500" />
+                <span>Activités Récentes</span>
+              </h3>
+              <div className="space-y-4">
+                {recentActivities.map((activity, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ x: 5 }}
+                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+                  >
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20">
+                      <activity.icon className="text-violet-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm">
+                        <span className="font-medium text-violet-400">{activity.user}</span>
+                        {" "}{activity.action}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Prochains rendez-vous */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+            >
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <FiCalendar className="text-violet-500" />
+                <span>Prochains Rendez-vous</span>
+              </h3>
+              <div className="space-y-4">
+                {upcomingAppointments.map((appointment, i) => (
+                  <motion.div
+                    key={i}
+                    whileHover={{ x: 5 }}
+                    className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-violet-400">
+                        {appointment.client}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {appointment.date} à {appointment.time}
+                      </p>
+                      <p className="text-sm mt-1">{appointment.subject}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs ${
+                      appointment.status === 'confirmé' 
+                        ? 'bg-emerald-500/20 text-emerald-400' 
+                        : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {appointment.status}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>
