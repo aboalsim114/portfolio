@@ -50,7 +50,7 @@ export default function Home() {
         <ProjectSection />
         <Certifications />
         <BookingSection />
-        <Projects />
+        
       </motion.div>
     </>
   );
