@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createToken } from '@/utils/jwt';
 import { cookies } from 'next/headers';
-import { SessionService } from '@/utils/session-service';
 
 export async function POST(request) {
   try {
@@ -16,32 +15,23 @@ export async function POST(request) {
       );
     }
 
-    // Créer le token JWT et la session
-    const userData = {
-      id: 1,
-      email,
-      isAdmin: true,
-      lastActivity: new Date().toISOString()
-    };
-    
-    const token = createToken(userData);
-    const sessionId = SessionService.createSession(1, userData);
+    // Créer le token JWT
+    const token = createToken({ email, isAdmin: true });
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
-      path: '/'
-    };
-
+    // Créer la réponse avec le cookie
     const response = NextResponse.json(
       { success: true, message: 'Connexion réussie' },
       { status: 200 }
     );
 
-    response.cookies.set('admin_token', token, cookieOptions);
-    response.cookies.set('session_id', sessionId, cookieOptions);
+    // Définir le cookie avec le token
+    response.cookies.set('admin_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 heures
+      path: '/'
+    });
 
     return response;
 

@@ -5,6 +5,8 @@ import { FaLock, FaEnvelope, FaFingerprint, FaKey } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -46,27 +48,26 @@ const CustomField = ({ field, form: { touched, errors }, icon: Icon, ...props })
 );
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    setIsLoading(true);
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password
-        })
+        body: JSON.stringify(values)
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        toast.success('Connexion réussie !', {
-          icon: '🔐',
-          style: { background: '#1E293B', color: 'white' }
-        });
-        window.location.href = '/dashboard';
+      if (response.ok) {
+        toast.success('Connexion réussie');
+        router.push('/dashboard');
+        router.refresh();
       } else {
-        throw new Error(data.message);
+        toast.error(data.message || 'Erreur de connexion');
       }
     } catch (error) {
       toast.error(error.message || 'Erreur de connexion', {

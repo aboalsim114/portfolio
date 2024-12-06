@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:seed": "npx prisma db seed"
   },
   "dependencies": {
     "@emailjs/browser": "^4.3.1",
@@ -52,5 +53,8 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     }
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

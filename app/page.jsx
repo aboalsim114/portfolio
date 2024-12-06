@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import Projects from './components/homepage/projects/Projects';
 
 // Import dynamique des composants avec SSR désactivé pour ceux qui utilisent document
 const HeroSection = dynamic(() => import('./components/homepage/hero-section'), {
@@ -49,6 +50,7 @@ export default function Home() {
         <ProjectSection />
         <Certifications />
         <BookingSection />
+        <Projects />
       </motion.div>
     </>
   );
