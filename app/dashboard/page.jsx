@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [dashboardStats, setDashboardStats] = useState({
     projects: 0,
     appointments: 0,
@@ -22,13 +23,35 @@ export default function Dashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      const projectsResponse = await fetch('/api/projects');
+      const [projectsResponse, appointmentsResponse] = await Promise.all([
+        fetch('/api/projects'),
+        fetch('/api/appointments')
+      ]);
+
       const projectsData = await projectsResponse.json();
+      const appointmentsData = await appointmentsResponse.json();
+      
+      const nextAppointments = appointmentsData.appointments
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 2)
+        .map(apt => ({
+          client: apt.client,
+          date: new Date(apt.date).toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          }),
+          time: apt.time,
+          subject: apt.subject,
+          status: apt.status
+        }));
+
+      setUpcomingAppointments(nextAppointments);
       
       setDashboardStats(prev => ({
         ...prev,
         projects: Array.isArray(projectsData) ? projectsData.length : 0,
-        appointments: 8,
+        appointments: appointmentsData.appointments.length,
         visits: 2400,
         conversations: 156
       }));
@@ -153,23 +176,6 @@ export default function Dashboard() {
       time: "Il y a 1j", 
       icon: FiMessageCircle 
     },
-  ];
-
-  const upcomingAppointments = [
-    {
-      client: "Jean Dupont",
-      date: "23 Avril 2024",
-      time: "14:00",
-      subject: "Consultation Web",
-      status: "confirmé"
-    },
-    {
-      client: "Marie Martin",
-      date: "24 Avril 2024",
-      time: "15:30",
-      subject: "Projet Mobile",
-      status: "en attente"
-    }
   ];
 
   return (
