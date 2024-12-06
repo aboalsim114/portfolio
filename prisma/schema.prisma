@@ -21,4 +21,17 @@ model Project {
   image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Appointment {
+  id        String   @id @default(cuid())
+  email     String
+  client    String
+  date      DateTime
+  time      String
+  subject   String
+  message   String?
+  status    String   @default("en attente")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 } 

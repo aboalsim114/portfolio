@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { zoomConfig } from '@/utils/zoom-config';
 import nodemailer from 'nodemailer';
+import { PrismaClient, Prisma } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function POST(request) {
   try {
@@ -162,8 +165,22 @@ export async function POST(request) {
       throw new Error('Erreur lors de l\'envoi des emails');
     }
 
+    // Créer le rendez-vous dans la base de données
+    const appointment = await prisma.appointment.create({
+      data: {
+        email,
+        client: email.split('@')[0],
+        date: new Date(date),
+        time,
+        subject,
+        message,
+        status: 'en attente'
+      }
+    });
+
     return NextResponse.json({
       success: true,
+      appointment,
       meeting: {
         id: meeting.id,
         joinUrl: meeting.join_url,

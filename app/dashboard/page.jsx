@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiHome, FiUsers, FiMail, FiLogOut, FiBriefcase, FiFileText, FiActivity, FiClock, FiGithub, FiArrowUp, FiEye, FiStar, FiMessageCircle, FiCalendar } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import ProjectsManager from '../components/dashboard/ProjectsManager';
+import AppointmentsManager from '../components/dashboard/AppointmentsManager';
 import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
@@ -353,6 +354,10 @@ export default function Dashboard() {
 
           {activeTab === 'projects' && (
             <ProjectsManager />
+          )}
+
+          {activeTab === 'appointments' && (
+            <AppointmentsManager />
           )}
 
           {/* Ajoutez d'autres conditions pour les autres onglets */}
