@@ -18,6 +18,7 @@
     "@sendgrid/mail": "^8.1.4",
     "@zoomus/websdk": "^2.18.3",
     "axios": "^1.6.8",
+    "formik": "^2.4.6",
     "framer-motion": "^11.13.1",
     "lottie-react": "^2.4.0",
     "next": "^14.2.15",
@@ -31,7 +32,8 @@
     "react-toastify": "^10.0.4",
     "sharp": "^0.33.5",
     "sweetalert2": "^11.14.5",
-    "typed.js": "^2.1.0"
+    "typed.js": "^2.1.0",
+    "yup": "^1.5.0"
   },
   "devDependencies": {
     "autoprefixer": "latest",
@@ -43,7 +45,9 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     }
