@@ -101,28 +101,28 @@ export default function Dashboard() {
       icon: FiBriefcase, 
       label: 'Projets', 
       value: dashboardStats.projects.toString(), 
-      change: '+3 ce mois', 
+     
       color: 'from-violet-600 to-fuchsia-600' 
     },
     { 
       icon: FiMail, 
       label: 'Rendez-vous', 
       value: dashboardStats.appointments.toString(), 
-      change: '3 à venir', 
+      
       color: 'from-blue-600 to-cyan-600' 
     },
     { 
       icon: FiEye, 
       label: 'Visites', 
       value: dashboardStats.visits.toString(), 
-      change: '+18%', 
+     
       color: 'from-emerald-600 to-teal-600' 
     },
     { 
       icon: FiMessageCircle, 
       label: 'Conversations', 
       value: dashboardStats.conversations.toString(), 
-      change: '+12 /jour', 
+    
       color: 'from-amber-600 to-orange-600' 
     },
   ];
