@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiCalendar, FiClock, FiUser, FiMail, FiMessageSquare, FiCheck, FiX } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiUser, FiMail, FiMessageSquare, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
 export default function AppointmentsManager() {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const appointmentsPerPage = 2;
 
   const fetchAppointments = async () => {
     try {
@@ -27,22 +29,15 @@ export default function AppointmentsManager() {
     fetchAppointments();
   }, []);
 
-  const handleStatusChange = async (appointmentId, newStatus) => {
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
+  // Calcul pour la pagination
+  const indexOfLastAppointment = currentPage * appointmentsPerPage;
+  const indexOfFirstAppointment = indexOfLastAppointment - appointmentsPerPage;
+  const currentAppointments = appointments.slice(indexOfFirstAppointment, indexOfLastAppointment);
+  const totalPages = Math.ceil(appointments.length / appointmentsPerPage);
 
-      const data = await response.json();
-      
-      if (!response.ok) throw new Error(data.error);
-      
-      toast.success('Statut mis à jour avec succès');
-      fetchAppointments();
-    } catch (error) {
-      toast.error('Erreur lors de la mise à jour du statut');
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
     }
   };
 
@@ -66,7 +61,7 @@ export default function AppointmentsManager() {
       </h2>
 
       <div className="grid gap-6">
-        {appointments.map((appointment) => (
+        {currentAppointments.map((appointment) => (
           <motion.div
             key={appointment.id}
             initial={{ opacity: 0, y: 20 }}
@@ -100,37 +95,6 @@ export default function AppointmentsManager() {
                   {appointment.message}
                 </div>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs ${
-                  appointment.status === 'confirmé' 
-                    ? 'bg-emerald-500/20 text-emerald-400' 
-                    : appointment.status === 'annulé'
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'bg-amber-500/20 text-amber-400'
-                }`}>
-                  {appointment.status}
-                </span>
-
-                <div className="flex gap-2 mt-4">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleStatusChange(appointment.id, 'confirmé')}
-                    className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                  >
-                    <FiCheck />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleStatusChange(appointment.id, 'annulé')}
-                    className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                  >
-                    <FiX />
-                  </motion.button>
-                </div>
-              </div>
             </div>
           </motion.div>
         ))}
@@ -141,6 +105,49 @@ export default function AppointmentsManager() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {appointments.length > 0 && (
+        <div className="flex justify-center items-center gap-4 mt-8">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-500 cursor-not-allowed' : 'text-violet-500 hover:bg-violet-500/20'}`}
+          >
+            <FiChevronLeft size={20} />
+          </motion.button>
+          
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+              <motion.button
+                key={number}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => paginate(number)}
+                className={`w-8 h-8 rounded-lg ${
+                  currentPage === number 
+                    ? 'bg-violet-500 text-white' 
+                    : 'text-violet-500 hover:bg-violet-500/20'
+                }`}
+              >
+                {number}
+              </motion.button>
+            ))}
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-500 cursor-not-allowed' : 'text-violet-500 hover:bg-violet-500/20'}`}
+          >
+            <FiChevronRight size={20} />
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 } 
