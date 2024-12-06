@@ -7,16 +7,39 @@ import { toast } from 'react-toastify';
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/check-session');
+        const data = await response.json();
+
+        if (!data.isAuthenticated) {
+          window.location.href = '/dashboard/login';
+          return;
+        }
+
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Erreur de vérification de session:', error);
+        window.location.href = '/dashboard/login';
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
-  const handleLogout = () => {
-    toast.success('Déconnexion réussie');
-    window.location.href = '/dashboard/login';
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      toast.success('Déconnexion réussie');
+      window.location.href = '/dashboard/login';
+    } catch (error) {
+      toast.error('Erreur lors de la déconnexion');
+    }
   };
 
   if (isLoading) {
@@ -25,6 +48,10 @@ export default function Dashboard() {
         <div className="animate-spin rounded-full h-16 w-16 border-4 border-violet-500 border-t-transparent" />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   const stats = [

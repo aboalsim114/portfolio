@@ -48,14 +48,28 @@ const CustomField = ({ field, form: { touched, errors }, icon: Icon, ...props })
 export default function LoginPage() {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success('Connexion réussie !', {
-        icon: '🔐',
-        style: { background: '#1E293B', color: 'white' }
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password
+        })
       });
-      window.location.href = '/dashboard';
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Connexion réussie !', {
+          icon: '🔐',
+          style: { background: '#1E293B', color: 'white' }
+        });
+        window.location.href = '/dashboard';
+      } else {
+        throw new Error(data.message);
+      }
     } catch (error) {
-      toast.error('Erreur de connexion', {
+      toast.error(error.message || 'Erreur de connexion', {
         icon: '🚫',
         style: { background: '#1E293B', color: 'white' }
       });
