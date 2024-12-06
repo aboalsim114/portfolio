@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEdit2, FiTrash2, FiSave, FiX } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
 export default function ProjectsManager() {
@@ -10,6 +10,8 @@ export default function ProjectsManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProject, setEditingProject] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [projectsPerPage] = useState(4);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -34,6 +36,49 @@ export default function ProjectsManager() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = projects.slice(indexOfFirstProject, indexOfLastProject);
+  const totalPages = Math.ceil(projects.length / projectsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const PaginationButtons = () => {
+    return (
+      <div className="flex justify-center gap-2 mt-6">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Précédent
+        </button>
+        
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index}
+            onClick={() => paginate(index + 1)}
+            className={`px-4 py-2 rounded-xl ${
+              currentPage === index + 1
+                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600'
+                : 'bg-white/5 hover:bg-white/10'
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Suivant
+        </button>
+      </div>
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -97,11 +142,23 @@ export default function ProjectsManager() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600"
+          onClick={() => {
+            setEditingProject(null);
+            setFormData({
+              name: '',
+              description: '',
+              tools: [],
+              myRole: '',
+              code: '',
+              demo: '',
+              image: ''
+            });
+            setShowForm(true);
+          }}
+          className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600"
         >
-          {showForm ? <FiX /> : <FiPlus />}
-          <span>{showForm ? 'Annuler' : 'Nouveau Projet'}</span>
+          <FiPlus className="inline-block mr-2" />
+          Nouveau Projet
         </motion.button>
       </div>
 
@@ -174,7 +231,7 @@ export default function ProjectsManager() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project) => (
+        {currentProjects.map((project) => (
           <motion.div
             key={project.id}
             className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10"
@@ -216,6 +273,8 @@ export default function ProjectsManager() {
           </motion.div>
         ))}
       </div>
+
+      <PaginationButtons />
     </div>
   );
 } 
