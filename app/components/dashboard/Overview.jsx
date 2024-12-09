@@ -30,25 +30,43 @@ ChartJS.register(
   Filler
 );
 
-// Ajouter ces constantes pour les graphiques
+// Mise à jour des constantes pour les graphiques
 const chartGradient = {
   line: {
-    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+    backgroundColor: 'rgba(124, 58, 237, 0.05)',
     borderColor: '#7c3aed',
     pointBackgroundColor: '#fff',
     pointBorderColor: '#7c3aed',
     pointHoverBackgroundColor: '#7c3aed',
-    pointHoverBorderColor: '#fff'
+    pointHoverBorderColor: '#fff',
+    shadowColor: 'rgba(124, 58, 237, 0.5)'
   },
   bar: {
     colors: [
-      'rgba(99, 102, 241, 0.8)',   // Indigo
-      'rgba(168, 85, 247, 0.8)',   // Purple
-      'rgba(236, 72, 153, 0.8)',   // Pink
-      'rgba(59, 130, 246, 0.8)',   // Blue
-      'rgba(16, 185, 129, 0.8)',   // Green
-      'rgba(245, 158, 11, 0.8)'    // Yellow
+      'rgba(139, 92, 246, 0.8)',  // Violet
+      'rgba(236, 72, 153, 0.8)',  // Rose
+      'rgba(59, 130, 246, 0.8)',  // Bleu
+      'rgba(16, 185, 129, 0.8)',  // Vert
+      'rgba(245, 158, 11, 0.8)',  // Orange
+      'rgba(99, 102, 241, 0.8)'   // Indigo
+    ],
+    hoverColors: [
+      'rgba(139, 92, 246, 1)',
+      'rgba(236, 72, 153, 1)',
+      'rgba(59, 130, 246, 1)',
+      'rgba(16, 185, 129, 1)',
+      'rgba(245, 158, 11, 1)',
+      'rgba(99, 102, 241, 1)'
     ]
+  },
+  appointments: {
+    backgroundColor: 'rgba(236, 72, 153, 0.05)', // Rose
+    borderColor: '#ec4899',
+    pointBackgroundColor: '#fff',
+    pointBorderColor: '#ec4899',
+    pointHoverBackgroundColor: '#ec4899',
+    pointHoverBorderColor: '#fff',
+    shadowColor: 'rgba(236, 72, 153, 0.5)'
   }
 };
 
@@ -63,26 +81,37 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
       fill: true,
       tension: 0.4,
       borderWidth: 3,
-      pointRadius: 4,
-      pointHoverRadius: 6,
+      pointRadius: 6,
+      pointHoverRadius: 8,
       pointBackgroundColor: chartGradient.line.pointBackgroundColor,
       pointBorderColor: chartGradient.line.pointBorderColor,
       pointHoverBackgroundColor: chartGradient.line.pointHoverBackgroundColor,
       pointHoverBorderColor: chartGradient.line.pointHoverBorderColor,
-      pointBorderWidth: 2
+      pointBorderWidth: 2,
+      pointShadowBlur: 10,
+      pointShadowColor: chartGradient.line.shadowColor
     }]
   });
 
-  const [techStackData, setTechStackData] = useState({
-    labels: ['React', 'Node.js', 'Next.js', 'TypeScript', 'TailwindCSS', 'MongoDB'],
+  const [appointmentsData, setAppointmentsData] = useState({
+    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
     datasets: [{
-      label: 'Technologies utilisées',
-      data: [0, 0, 0, 0, 0, 0],
-      backgroundColor: chartGradient.bar.colors,
-      borderWidth: 0,
-      borderRadius: 12,
-      maxBarThickness: 40,
-      minBarLength: 10
+      label: 'Rendez-vous',
+      data: [0, 0, 0, 0, 0, 0, 0],
+      borderColor: chartGradient.appointments.borderColor,
+      backgroundColor: chartGradient.appointments.backgroundColor,
+      fill: true,
+      tension: 0.4,
+      borderWidth: 3,
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointBackgroundColor: chartGradient.appointments.pointBackgroundColor,
+      pointBorderColor: chartGradient.appointments.pointBorderColor,
+      pointHoverBackgroundColor: chartGradient.appointments.pointHoverBackgroundColor,
+      pointHoverBorderColor: chartGradient.appointments.pointHoverBorderColor,
+      pointBorderWidth: 2,
+      pointShadowBlur: 10,
+      pointShadowColor: chartGradient.appointments.shadowColor
     }]
   });
 
@@ -100,22 +129,6 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
             data: data.monthlyProjects
           }]
         }));
-
-        // Mise à jour des données pour le nouveau graphique
-        setTechStackData(prev => ({
-          ...prev,
-          datasets: [{
-            ...prev.datasets[0],
-            data: [
-              data.techStack.react || 0,
-              data.techStack.nodejs || 0,
-              data.techStack.nextjs || 0,
-              data.techStack.typescript || 0,
-              data.techStack.tailwind || 0,
-              data.techStack.mongodb || 0
-            ]
-          }]
-        }));
       } catch (error) {
         console.error('Erreur lors de la récupération des statistiques:', error);
       }
@@ -126,7 +139,30 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
     return () => clearInterval(interval);
   }, []);
 
-  // Mise à jour de la configuration des graphiques
+  useEffect(() => {
+    const fetchAppointmentsStats = async () => {
+      try {
+        const response = await fetch('/api/appointments/stats');
+        const data = await response.json();
+        
+        setAppointmentsData(prev => ({
+          ...prev,
+          datasets: [{
+            ...prev.datasets[0],
+            data: data.weeklyAppointments || [0, 0, 0, 0, 0, 0, 0]
+          }]
+        }));
+      } catch (error) {
+        console.error('Erreur lors de la récupération des statistiques des rendez-vous:', error);
+      }
+    };
+
+    fetchAppointmentsStats();
+    const interval = setInterval(fetchAppointmentsStats, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Mise à jour des options des graphiques
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -135,10 +171,15 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
         titleColor: '#fff',
         bodyColor: '#fff',
-        padding: 12,
+        padding: {
+          top: 10,
+          right: 15,
+          bottom: 10,
+          left: 15
+        },
         borderColor: 'rgba(124, 58, 237, 0.3)',
         borderWidth: 1,
         displayColors: false,
@@ -151,6 +192,7 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           size: 12,
           family: 'monospace'
         },
+        cornerRadius: 8,
         callbacks: {
           title: function(context) {
             return `📅 ${context[0].label}`;
@@ -166,7 +208,8 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         beginAtZero: true,
         grid: {
           color: 'rgba(124, 58, 237, 0.1)',
-          drawBorder: false
+          drawBorder: false,
+          lineWidth: 1
         },
         ticks: {
           color: 'rgba(255, 255, 255, 0.7)',
@@ -174,8 +217,11 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
             family: 'monospace',
             size: 12
           },
-          padding: 8,
-          stepSize: 1
+          padding: 10,
+          stepSize: 1,
+          callback: function(value) {
+            return value.toFixed(0);
+          }
         }
       },
       x: {
@@ -188,13 +234,29 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
             family: 'monospace',
             size: 12
           },
-          padding: 8
+          padding: 10
         }
       }
     },
     interaction: {
       intersect: false,
       mode: 'index'
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeInOutQuart'
+    },
+    elements: {
+      line: {
+        borderJoinStyle: 'round',
+        borderCapStyle: 'round',
+        tension: 0.4
+      },
+      point: {
+        hitRadius: 10,
+        hoverRadius: 8,
+        radius: 6
+      }
     }
   };
 
@@ -259,36 +321,34 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           whileHover={{ scale: 1.01 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-600/10 via-violet-600/10 to-transparent rounded-2xl" />
-          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-fuchsia-500/30 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-600/10 via-rose-600/10 to-transparent rounded-2xl" />
+          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-pink-500/30 transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
-                Technologies Utilisées
+              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
+                Rendez-vous Hebdomadaires
               </h3>
-              <div className="px-3 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-400 text-sm border border-fuchsia-500/20">
-                Top 6
+              <div className="px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 text-sm border border-pink-500/20">
+                Cette semaine
               </div>
             </div>
             <div className="h-[300px] relative">
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-lg" />
-              <Bar 
-                data={techStackData} 
+              <Line 
+                data={appointmentsData} 
                 options={{
                   ...chartOptions,
-                  indexAxis: 'y',
-                  scales: {
-                    ...chartOptions.scales,
-                    x: {
-                      ...chartOptions.scales.x,
-                      grid: {
-                        color: 'rgba(124, 58, 237, 0.1)',
-                        drawBorder: false
-                      }
-                    },
-                    y: {
-                      ...chartOptions.scales.y,
-                      grid: {
-                        display: false
+                  plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                      ...chartOptions.plugins.tooltip,
+                      callbacks: {
+                        title: function(context) {
+                          return `📅 ${context[0].label}`;
+                        },
+                        label: function(context) {
+                          const count = context.parsed.y;
+                          return `🗓️ ${count} rendez-vous`;
+                        }
                       }
                     }
                   }
