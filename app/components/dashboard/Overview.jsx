@@ -15,7 +15,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { FiArrowUp, FiClock, FiCalendar } from 'react-icons/fi';
+import { FiArrowUp, FiClock, FiCalendar, FiTrendingUp, FiUsers, FiZap } from 'react-icons/fi';
 
 // Enregistrement des composants Chart.js nécessaires
 ChartJS.register(
@@ -67,6 +67,28 @@ const chartGradient = {
     pointHoverBackgroundColor: '#ec4899',
     pointHoverBorderColor: '#fff',
     shadowColor: 'rgba(236, 72, 153, 0.5)'
+  }
+};
+
+// Mise à jour des constantes de style
+const CHART_STYLES = {
+  projects: {
+    gradient: {
+      start: '#4f46e5', // Indigo
+      mid: '#7c3aed',   // Violet
+      end: '#8b5cf6'    // Purple
+    },
+    shadow: 'rgba(124, 58, 237, 0.5)',
+    border: '#7c3aed'
+  },
+  appointments: {
+    gradient: {
+      start: '#ec4899', // Pink
+      mid: '#db2777',   // Rose
+      end: '#be185d'    // Deep Rose
+    },
+    shadow: 'rgba(236, 72, 153, 0.5)',
+    border: '#ec4899'
   }
 };
 
@@ -175,24 +197,20 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         titleColor: '#fff',
         bodyColor: '#fff',
         padding: {
-          top: 10,
-          right: 15,
-          bottom: 10,
-          left: 15
+          top: 12,
+          right: 18,
+          bottom: 12,
+          left: 18
         },
-        borderColor: 'rgba(124, 58, 237, 0.3)',
-        borderWidth: 1,
-        displayColors: false,
-        titleFont: {
-          size: 14,
-          weight: 'bold',
-          family: 'monospace'
-        },
-        bodyFont: {
-          size: 12,
-          family: 'monospace'
-        },
+        titleSpacing: 8,
+        bodySpacing: 6,
+        boxPadding: 6,
         cornerRadius: 8,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        caretSize: 6,
+        caretPadding: 8,
+        displayColors: false,
         callbacks: {
           title: function(context) {
             return `📅 ${context[0].label}`;
@@ -200,6 +218,9 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           label: function(context) {
             return `📊 ${context.parsed.y} projets`;
           }
+        },
+        animation: {
+          duration: 200
         }
       }
     },
@@ -240,11 +261,20 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
     },
     interaction: {
       intersect: false,
-      mode: 'index'
+      mode: 'nearest',
+      axis: 'x'
     },
     animation: {
-      duration: 1000,
-      easing: 'easeInOutQuart'
+      duration: 1500,
+      easing: 'easeInOutQuart',
+      delay: (context) => context.dataIndex * 100
+    },
+    transitions: {
+      active: {
+        animation: {
+          duration: 200
+        }
+      }
     },
     elements: {
       line: {
@@ -298,19 +328,42 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           whileHover={{ scale: 1.01 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-fuchsia-600/10 to-transparent rounded-2xl" />
-          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-violet-500/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                Évolution des Projets
-              </h3>
-              <div className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-sm border border-violet-500/20">
-                6 derniers mois
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-violet-500/10 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 via-purple-500/20 to-fuchsia-500/20"
+                  >
+                    <FiTrendingUp className="text-violet-400 text-xl" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                      Évolution des Projets
+                    </h3>
+                    <p className="text-xs text-violet-400/80 font-mono mt-1">
+                      Progression sur les 6 derniers mois
+                    </p>
+                  </div>
+                </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <FiZap className="text-violet-400" />
+                    <span className="text-sm text-violet-400 font-mono">6M</span>
+                  </div>
+                </motion.div>
               </div>
-            </div>
-            <div className="h-[300px] relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-lg" />
-              <Line data={projectsData} options={chartOptions} />
+              <div className="h-[300px] relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent pointer-events-none z-10" />
+                <Line data={projectsData} options={chartOptions} />
+              </div>
             </div>
           </div>
         </motion.div>
@@ -321,75 +374,131 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           whileHover={{ scale: 1.01 }}
           className="relative group"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-pink-600/10 via-rose-600/10 to-transparent rounded-2xl" />
-          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-pink-500/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
-                Rendez-vous Hebdomadaires
-              </h3>
-              <div className="px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 text-sm border border-pink-500/20">
-                Cette semaine
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-pink-500/20 via-rose-500/20 to-red-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/10 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="p-2 rounded-lg bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-red-500/20"
+                  >
+                    <FiUsers className="text-pink-400 text-xl" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">
+                      Rendez-vous Hebdomadaires
+                    </h3>
+                    <p className="text-xs text-pink-400/80 font-mono mt-1">
+                      Vue de la semaine en cours
+                    </p>
+                  </div>
+                </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <FiZap className="text-pink-400" />
+                    <span className="text-sm text-pink-400 font-mono">7J</span>
+                  </div>
+                </motion.div>
               </div>
-            </div>
-            <div className="h-[300px] relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-lg" />
-              <Line 
-                data={appointmentsData} 
-                options={{
+              <div className="h-[300px] relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent pointer-events-none z-10" />
+                <Line data={appointmentsData} options={{
                   ...chartOptions,
                   plugins: {
                     ...chartOptions.plugins,
                     tooltip: {
                       ...chartOptions.plugins.tooltip,
                       callbacks: {
-                        title: function(context) {
-                          return `📅 ${context[0].label}`;
-                        },
-                        label: function(context) {
-                          const count = context.parsed.y;
-                          return `🗓️ ${count} rendez-vous`;
-                        }
+                        title: (context) => `📅 ${context[0].label}`,
+                        label: (context) => `👥 ${context.parsed.y} rendez-vous`
                       }
                     }
                   }
-                }} 
-              />
+                }} />
+              </div>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Section des activités récentes et rendez-vous */}
+      {/* Section des activités récentes et rendez-vous avec design amélioré */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Activités récentes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+          whileHover={{ scale: 1.01 }}
+          className="relative group"
         >
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <FiClock className="text-violet-500" />
-            <span>Activités Récentes</span>
-          </h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ x: 5 }}
-                className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
-              >
-                <div className="p-2 rounded-lg bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20">
-                  <activity.icon className="text-violet-400" />
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-violet-500/10 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+            
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 via-purple-500/20 to-fuchsia-500/20"
+                  >
+                    <FiClock className="text-violet-400 text-xl" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                      Activités Récentes
+                    </h3>
+                    <p className="text-xs text-violet-400/80 font-mono mt-1">
+                      Dernières actions effectuées
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm">
-                    <span className="font-medium text-violet-400">{activity.user}</span>
-                    {" "}{activity.action}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
-                </div>
-              </motion.div>
-            ))}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <FiZap className="text-violet-400" />
+                    <span className="text-sm text-violet-400 font-mono">LIVE</span>
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="space-y-4">
+                {recentActivities.map((activity, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 5, backgroundColor: 'rgba(124, 58, 237, 0.05)' }}
+                    className="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-violet-500/20 transition-all duration-300"
+                  >
+                    <motion.div
+                      whileHover={{ rotate: 15, scale: 1.1 }}
+                      className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 via-purple-500/20 to-fuchsia-500/20"
+                    >
+                      <activity.icon className="text-violet-400" />
+                    </motion.div>
+                    <div className="flex-1">
+                      <p className="text-sm font-mono">
+                        <span className="font-medium bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                          {activity.user}
+                        </span>
+                        <span className="text-gray-300"> {activity.action}</span>
+                      </p>
+                      <p className="text-xs text-violet-400/60 mt-1 font-mono">{activity.time}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -397,37 +506,76 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+          whileHover={{ scale: 1.01 }}
+          className="relative group"
         >
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <FiCalendar className="text-violet-500" />
-            <span>Prochains Rendez-vous</span>
-          </h3>
-          <div className="space-y-4">
-            {upcomingAppointments.map((appointment, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ x: 5 }}
-                className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
-              >
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-violet-400">
-                    {appointment.client}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {appointment.date} à {appointment.time}
-                  </p>
-                  <p className="text-sm mt-1">{appointment.subject}</p>
+          <div className="absolute -inset-[1px] bg-gradient-to-r from-pink-500/20 via-rose-500/20 to-red-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/10 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+            
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                    className="p-2 rounded-lg bg-gradient-to-br from-pink-500/20 via-rose-500/20 to-red-500/20"
+                  >
+                    <FiCalendar className="text-pink-400 text-xl" />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 bg-clip-text text-transparent">
+                      Prochains Rendez-vous
+                    </h3>
+                    <p className="text-xs text-pink-400/80 font-mono mt-1">
+                      Consultations à venir
+                    </p>
+                  </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs ${
-                  appointment.status === 'confirmé' 
-                    ? 'bg-emerald-500/20 text-emerald-400' 
-                    : 'bg-amber-500/20 text-amber-400'
-                }`}>
-                  {appointment.status}
-                </span>
-              </motion.div>
-            ))}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20"
+                >
+                  <div className="flex items-center gap-2">
+                    <FiZap className="text-pink-400" />
+                    <span className="text-sm text-pink-400 font-mono">NEXT</span>
+                  </div>
+                </motion.div>
+              </div>
+
+              <div className="space-y-4">
+                {upcomingAppointments.map((appointment, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ x: 5, backgroundColor: 'rgba(236, 72, 153, 0.05)' }}
+                    className="flex items-center justify-between p-4 rounded-xl border border-transparent hover:border-pink-500/20 transition-all duration-300"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-mono font-medium bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
+                        {appointment.client}
+                      </p>
+                      <p className="text-xs text-pink-400/60 mt-1 font-mono">
+                        {appointment.date} à {appointment.time}
+                      </p>
+                      <p className="text-sm mt-1 text-gray-300 font-mono">{appointment.subject}</p>
+                    </div>
+                    <motion.span
+                      whileHover={{ scale: 1.05 }}
+                      className={`px-3 py-1 rounded-full text-xs font-mono ${
+                        appointment.status === 'confirmé' 
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' 
+                          : 'bg-amber-500/20 text-amber-400 border border-amber-500/20'
+                      }`}
+                    >
+                      {appointment.status}
+                    </motion.span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
