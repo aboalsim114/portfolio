@@ -9,6 +9,7 @@ import AppointmentsManager from '../components/dashboard/AppointmentsManager';
 import { useRouter } from 'next/navigation';
 import Overview from '../components/dashboard/Overview';
 import SettingsManager from '../components/dashboard/SettingsManager';
+import ChatbotManager from '../components/dashboard/ChatbotManager';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -260,6 +261,14 @@ export default function Dashboard() {
 
           {activeTab === 'appointments' && (
             <AppointmentsManager />
+          )}
+
+          {activeTab === 'blog' && (
+            <BlogManager />
+          )}
+
+          {activeTab === 'chatbot' && (
+            <ChatbotManager />
           )}
 
           {activeTab === 'settings' && (

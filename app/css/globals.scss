@@ -97,3 +97,13 @@ body {
 .animate-float {
   animation: float 5s ease-in-out infinite;
 }
+
+.shadow-neon {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.bg-grid-white\/5 {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
