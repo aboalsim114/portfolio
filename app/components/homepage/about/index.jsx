@@ -2,33 +2,101 @@
 
 import { personalData } from "@/utils/data/personal-data";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { FaCode, FaRocket } from "react-icons/fa";
 
 function AboutSection() {
   return (
-    <div id="about" className="my-12 lg:my-16 relative">
-      <div className="hidden lg:flex flex-col items-center absolute top-16 -right-8">
-        <span className="bg-[#1a1443] w-fit text-white rotate-90 p-2 px-5 text-xl rounded-md">
-          À PROPOS
-        </span>
-        <span className="h-36 w-[2px] bg-[#1a1443]"></span>
+    <div id="about" className="relative py-24">
+      {/* Fond dynamique */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(22,242,179,0.1),transparent_50%)]"></div>
+        <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent top-0"></div>
+        <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent bottom-0"></div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        <div className="order-2 lg:order-1">
-          <p className="font-medium mb-5 text-[#16f2b3] text-xl uppercase">
-            Qui suis-je ?
-          </p>
-          <p className="text-gray-200 text-sm lg:text-lg">
-            {personalData.description}
-          </p>
-        </div>
-        <div className="flex justify-center order-1 lg:order-2">
-          <Image
-            src={personalData.profile}
-            width={280}
-            height={280}
-            alt="Abu Said"
-            className="rounded-lg transition-all duration-1000 grayscale hover:grayscale-0 hover:scale-110 cursor-pointer"
-          />
+
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Carte de profil */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="lg:col-span-1 bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-[#16f2b3]/20 relative overflow-hidden group"
+          >
+            {/* Effet de brillance */}
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-transparent via-[#16f2b3] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur"></div>
+            
+            <div className="relative">
+              <div className="flex flex-col items-center">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#16f2b3] to-purple-600 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                  <Image
+                    src={personalData.profile}
+                    width={150}
+                    height={150}
+                    alt="Profile"
+                    className="rounded-full border-4 border-[#16f2b3]/20 relative z-10"
+                  />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Sami Abdulhalim</h2>
+                <p className="text-[#16f2b3] mb-6">{personalData.designation}</p>
+                
+                {/* Stats */}
+                <div className="grid grid-cols-2 w-full gap-4">
+                  <div className="bg-black/30 rounded-xl p-4 text-center border border-[#16f2b3]/20">
+                    <div className="text-2xl font-bold text-[#16f2b3]">2+</div>
+                    <div className="text-sm text-gray-400">Années d'exp.</div>
+                  </div>
+                  <div className="bg-black/30 rounded-xl p-4 text-center border border-[#16f2b3]/20">
+                    <div className="text-2xl font-bold text-[#16f2b3]">15+</div>
+                    <div className="text-sm text-gray-400">Projets</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Section description */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2 space-y-8"
+          >
+            {/* En-tête */}
+            <div className="flex items-center gap-4 mb-8">
+              <FaRocket className="text-3xl text-[#16f2b3]" />
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-[#16f2b3] to-purple-500 bg-clip-text text-transparent">
+                À Propos de Moi
+              </h2>
+            </div>
+
+            {/* Description */}
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-[#16f2b3]/20">
+              <p className="text-gray-300 leading-relaxed text-lg">
+                {personalData.description}
+              </p>
+            </div>
+
+            {/* Compétences */}
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-[#16f2b3]/20">
+              <div className="flex items-center gap-4 mb-6">
+                <FaCode className="text-2xl text-[#16f2b3]" />
+                <h3 className="text-xl font-bold text-white">Technologies Maîtrisées</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {["JavaScript", "React", "Node.js", "Python", "SQL", "Git", "Docker"].map((skill) => (
+                  <motion.span
+                    key={skill}
+                    whileHover={{ scale: 1.05 }}
+                    className="px-4 py-2 rounded-full bg-gradient-to-r from-[#16f2b3]/10 to-purple-500/10 border border-[#16f2b3]/20 text-[#16f2b3]"
+                  >
+                    {skill}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
