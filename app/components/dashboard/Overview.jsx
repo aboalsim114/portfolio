@@ -390,7 +390,6 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
                 >
                   <div className="flex items-center gap-2">
                     <FiZap className="text-violet-400" />
-                    <span className="text-sm text-violet-400 font-mono">6M</span>
                   </div>
                 </motion.div>
               </div>
@@ -436,7 +435,6 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
                 >
                   <div className="flex items-center gap-2">
                     <FiZap className="text-pink-400" />
-                    <span className="text-sm text-pink-400 font-mono">7J</span>
                   </div>
                 </motion.div>
               </div>
