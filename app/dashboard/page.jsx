@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import ProjectsManager from '../components/dashboard/ProjectsManager';
 import AppointmentsManager from '../components/dashboard/AppointmentsManager';
 import { useRouter } from 'next/navigation';
+import Overview from '../components/dashboard/Overview';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -240,108 +241,11 @@ export default function Dashboard() {
         {/* Contenu principal */}
         <div className="space-y-8">
           {activeTab === 'home' && (
-            <>
-              {/* Statistiques */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="relative group"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                    <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/20 transition-colors">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color}`}>
-                          <stat.icon className="text-white text-xl" />
-                        </div>
-                        <div className="flex items-center gap-1 text-emerald-400">
-                          <FiArrowUp className="text-sm" />
-                          <span className="text-sm font-medium">{stat.change}</span>
-                        </div>
-                      </div>
-                      <p className="text-gray-400 text-sm">{stat.label}</p>
-                      <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Grid 2 colonnes */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Activités récentes */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
-                >
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <FiClock className="text-violet-500" />
-                    <span>Activités Récentes</span>
-                  </h3>
-                  <div className="space-y-4">
-                    {recentActivities.map((activity, i) => (
-                      <motion.div
-                        key={i}
-                        whileHover={{ x: 5 }}
-                        className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
-                      >
-                        <div className="p-2 rounded-lg bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20">
-                          <activity.icon className="text-violet-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm">
-                            <span className="font-medium text-violet-400">{activity.user}</span>
-                            {" "}{activity.action}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Prochains rendez-vous */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
-                >
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <FiCalendar className="text-violet-500" />
-                    <span>Prochains Rendez-vous</span>
-                  </h3>
-                  <div className="space-y-4">
-                    {upcomingAppointments.map((appointment, i) => (
-                      <motion.div
-                        key={i}
-                        whileHover={{ x: 5 }}
-                        className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10"
-                      >
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-violet-400">
-                            {appointment.client}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {appointment.date} à {appointment.time}
-                          </p>
-                          <p className="text-sm mt-1">{appointment.subject}</p>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-xs ${
-                          appointment.status === 'confirmé' 
-                            ? 'bg-emerald-500/20 text-emerald-400' 
-                            : 'bg-amber-500/20 text-amber-400'
-                        }`}>
-                          {appointment.status}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </>
+            <Overview 
+              stats={stats} 
+              recentActivities={recentActivities}
+              upcomingAppointments={upcomingAppointments}
+            />
           )}
 
           {activeTab === 'projects' && (
