@@ -30,16 +30,46 @@ ChartJS.register(
   Filler
 );
 
+// Ajouter ces constantes pour les graphiques
+const chartGradient = {
+  line: {
+    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+    borderColor: '#7c3aed',
+    pointBackgroundColor: '#fff',
+    pointBorderColor: '#7c3aed',
+    pointHoverBackgroundColor: '#7c3aed',
+    pointHoverBorderColor: '#fff'
+  },
+  bar: {
+    colors: [
+      'rgba(99, 102, 241, 0.8)',   // Indigo
+      'rgba(168, 85, 247, 0.8)',   // Purple
+      'rgba(236, 72, 153, 0.8)',   // Pink
+      'rgba(59, 130, 246, 0.8)',   // Blue
+      'rgba(16, 185, 129, 0.8)',   // Green
+      'rgba(245, 158, 11, 0.8)'    // Yellow
+    ]
+  }
+};
+
 export default function Overview({ stats, recentActivities, upcomingAppointments }) {
   const [projectsData, setProjectsData] = useState({
     labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
     datasets: [{
       label: 'Projets',
       data: [0, 0, 0, 0, 0, 0],
-      borderColor: 'rgb(124, 58, 237)',
-      backgroundColor: 'rgba(124, 58, 237, 0.1)',
+      borderColor: chartGradient.line.borderColor,
+      backgroundColor: chartGradient.line.backgroundColor,
       fill: true,
-      tension: 0.4
+      tension: 0.4,
+      borderWidth: 3,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      pointBackgroundColor: chartGradient.line.pointBackgroundColor,
+      pointBorderColor: chartGradient.line.pointBorderColor,
+      pointHoverBackgroundColor: chartGradient.line.pointHoverBackgroundColor,
+      pointHoverBorderColor: chartGradient.line.pointHoverBorderColor,
+      pointBorderWidth: 2
     }]
   });
 
@@ -48,16 +78,11 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
     datasets: [{
       label: 'Technologies utilisées',
       data: [0, 0, 0, 0, 0, 0],
-      backgroundColor: [
-        'rgba(97, 218, 251, 0.8)',    // React - bleu clair
-        'rgba(104, 160, 99, 0.8)',    // Node.js - vert
-        'rgba(0, 0, 0, 0.8)',         // Next.js - noir
-        'rgba(49, 120, 198, 0.8)',    // TypeScript - bleu
-        'rgba(56, 189, 248, 0.8)',    // TailwindCSS - bleu ciel
-        'rgba(0, 237, 100, 0.8)'      // MongoDB - vert
-      ],
+      backgroundColor: chartGradient.bar.colors,
       borderWidth: 0,
-      borderRadius: 8
+      borderRadius: 12,
+      maxBarThickness: 40,
+      minBarLength: 10
     }]
   });
 
@@ -101,32 +126,75 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
     return () => clearInterval(interval);
   }, []);
 
+  // Mise à jour de la configuration des graphiques
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        borderColor: 'rgba(124, 58, 237, 0.3)',
+        borderWidth: 1,
+        displayColors: false,
+        titleFont: {
+          size: 14,
+          weight: 'bold',
+          family: 'monospace'
+        },
+        bodyFont: {
+          size: 12,
+          family: 'monospace'
+        },
+        callbacks: {
+          title: function(context) {
+            return `📅 ${context[0].label}`;
+          },
+          label: function(context) {
+            return `📊 ${context.parsed.y} projets`;
+          }
+        }
       }
     },
     scales: {
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)'
+          color: 'rgba(124, 58, 237, 0.1)',
+          drawBorder: false
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.7)'
+          color: 'rgba(255, 255, 255, 0.7)',
+          font: {
+            family: 'monospace',
+            size: 12
+          },
+          padding: 8,
+          stepSize: 1
         }
       },
       x: {
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)'
+          display: false
         },
         ticks: {
-          color: 'rgba(255, 255, 255, 0.7)'
+          color: 'rgba(255, 255, 255, 0.7)',
+          font: {
+            family: 'monospace',
+            size: 12
+          },
+          padding: 8
         }
       }
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index'
     }
   };
 
@@ -160,45 +228,73 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         ))}
       </div>
 
-      {/* Section des graphiques */}
+      {/* Section des graphiques avec design amélioré */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Graphique d'évolution des projets */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+          whileHover={{ scale: 1.01 }}
+          className="relative group"
         >
-          <h3 className="text-xl font-bold mb-6">Évolution des Projets</h3>
-          <div className="h-[300px]">
-            <Line data={projectsData} options={chartOptions} />
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-fuchsia-600/10 to-transparent rounded-2xl" />
+          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-violet-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+                Évolution des Projets
+              </h3>
+              <div className="px-3 py-1 rounded-full bg-violet-500/10 text-violet-400 text-sm border border-violet-500/20">
+                6 derniers mois
+              </div>
+            </div>
+            <div className="h-[300px] relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-lg" />
+              <Line data={projectsData} options={chartOptions} />
+            </div>
           </div>
         </motion.div>
 
-        {/* Nouveau graphique des technologies */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-white/20 transition-colors"
+          whileHover={{ scale: 1.01 }}
+          className="relative group"
         >
-          <h3 className="text-xl font-bold mb-6">Technologies Utilisées</h3>
-          <div className="h-[300px]">
-            <Bar 
-              data={techStackData} 
-              options={{
-                ...chartOptions,
-                indexAxis: 'y',
-                plugins: {
-                  ...chartOptions.plugins,
-                  tooltip: {
-                    callbacks: {
-                      label: function(context) {
-                        return `${context.parsed.x} projets`;
+          <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-600/10 via-violet-600/10 to-transparent rounded-2xl" />
+          <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6 hover:border-fuchsia-500/30 transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold font-mono bg-gradient-to-r from-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
+                Technologies Utilisées
+              </h3>
+              <div className="px-3 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-400 text-sm border border-fuchsia-500/20">
+                Top 6
+              </div>
+            </div>
+            <div className="h-[300px] relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none rounded-lg" />
+              <Bar 
+                data={techStackData} 
+                options={{
+                  ...chartOptions,
+                  indexAxis: 'y',
+                  scales: {
+                    ...chartOptions.scales,
+                    x: {
+                      ...chartOptions.scales.x,
+                      grid: {
+                        color: 'rgba(124, 58, 237, 0.1)',
+                        drawBorder: false
+                      }
+                    },
+                    y: {
+                      ...chartOptions.scales.y,
+                      grid: {
+                        display: false
                       }
                     }
                   }
-                }
-              }} 
-            />
+                }} 
+              />
+            </div>
           </div>
         </motion.div>
       </div>
