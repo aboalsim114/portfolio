@@ -92,6 +92,18 @@ const CHART_STYLES = {
   }
 };
 
+// Ajout de nouveaux effets visuels
+const NEON_EFFECTS = {
+  glow: {
+    primary: "0 0 20px rgba(22, 242, 179, 0.3), 0 0 40px rgba(22, 242, 179, 0.1)",
+    secondary: "0 0 20px rgba(236, 72, 153, 0.3), 0 0 40px rgba(236, 72, 153, 0.1)"
+  },
+  gradient: {
+    primary: "from-[#16f2b3] via-[#9333ea] to-[#16f2b3]",
+    secondary: "from-[#ec4899] via-[#9333ea] to-[#ec4899]"
+  }
+};
+
 export default function Overview({ stats, recentActivities, upcomingAppointments }) {
   const [projectsData, setProjectsData] = useState({
     labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
@@ -213,7 +225,7 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         displayColors: false,
         callbacks: {
           title: function(context) {
-            return `📅 ${context[0].label}`;
+            return `📊 ${context[0].label}`;
           },
           label: function(context) {
             return `📊 ${context.parsed.y} projets`;
@@ -300,37 +312,59 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="relative group"
+            className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-all duration-300" />
-            <div className="relative p-6 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 hover:border-white/20 transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#16f2b3]/10 via-[#9333ea]/10 to-[#16f2b3]/10 rounded-2xl" />
+            <div className="relative p-6 bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-[#16f2b3]/20">
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color}`}>
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 0.5 }}
+                  className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg hover:shadow-[#16f2b3]/20`}
+                >
                   <stat.icon className="text-white text-xl" />
-                </div>
-                <div className="flex items-center gap-1 text-emerald-400">
+                </motion.div>
+                <motion.div
+                  animate={{ 
+                    y: [0, -5, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="flex items-center gap-1 text-[#16f2b3]"
+                >
                   <FiArrowUp className="text-sm" />
-                  <span className="text-sm font-medium">{stat.change}</span>
-                </div>
+                  <span className="text-sm font-mono">{stat.change}</span>
+                </motion.div>
               </div>
-              <p className="text-gray-400 text-sm">{stat.label}</p>
-              <p className="text-2xl font-bold mt-1">{stat.value}</p>
+              <motion.div
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <p className="text-gray-400 text-sm font-mono uppercase tracking-wider mb-1">{stat.label}</p>
+                <p className="text-3xl font-bold font-mono bg-gradient-to-r from-[#16f2b3] via-[#9333ea] to-[#16f2b3] bg-clip-text text-transparent">
+                  {stat.value}
+                </p>
+              </motion.div>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Section des graphiques avec design amélioré */}
+      {/* Section des graphiques */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.01 }}
-          className="relative group"
+          className="relative"
         >
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-violet-500/10 p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(22,242,179,0.1),transparent_70%)] rounded-2xl" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-[#16f2b3]/20 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(22,242,179,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(22,242,179,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
+            
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -371,12 +405,12 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.01 }}
-          className="relative group"
+          className="relative"
         >
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-pink-500/20 via-rose-500/20 to-red-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/10 p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1),transparent_70%)] rounded-2xl" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/20 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
+            
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
@@ -427,18 +461,16 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
         </motion.div>
       </div>
 
-      {/* Section des activités récentes et rendez-vous avec design amélioré */}
+      {/* Section des activités et rendez-vous */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Activités récentes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.01 }}
-          className="relative group"
+          className="relative"
         >
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-violet-500/20 via-purple-500/20 to-fuchsia-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-violet-500/10 p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(124,58,237,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(124,58,237,0.1),transparent_70%)] rounded-2xl" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-violet-500/20 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(124,58,237,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
             
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
@@ -477,9 +509,12 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    whileHover={{ x: 5, backgroundColor: 'rgba(124, 58, 237, 0.05)' }}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-violet-500/20 transition-all duration-300"
+                    whileHover={{ x: 5, backgroundColor: 'rgba(22, 242, 179, 0.03)' }}
+                    className="flex items-center gap-4 p-4 rounded-xl border border-transparent hover:border-[#16f2b3]/20 transition-all duration-300 relative group"
                   >
+                    {/* Effet de brillance au survol */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#16f2b3]/5 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                    
                     <motion.div
                       whileHover={{ rotate: 15, scale: 1.1 }}
                       className="p-2 rounded-lg bg-gradient-to-br from-violet-500/20 via-purple-500/20 to-fuchsia-500/20"
@@ -502,16 +537,14 @@ export default function Overview({ stats, recentActivities, upcomingAppointments
           </div>
         </motion.div>
 
-        {/* Prochains rendez-vous */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ scale: 1.01 }}
-          className="relative group"
+          className="relative"
         >
-          <div className="absolute -inset-[1px] bg-gradient-to-r from-pink-500/20 via-rose-500/20 to-red-500/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500" />
-          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/10 p-6 overflow-hidden">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.05)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.05)_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1),transparent_70%)] rounded-2xl" />
+          <div className="relative bg-[#0f172a]/90 backdrop-blur-xl rounded-2xl border border-pink-500/20 p-6 overflow-hidden">
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(236,72,153,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(236,72,153,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
             
             <div className="relative">
               <div className="flex items-center justify-between mb-6">
