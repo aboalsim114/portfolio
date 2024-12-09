@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaLock, FaEnvelope, FaFingerprint, FaKey } from 'react-icons/fa';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
@@ -62,21 +62,24 @@ export default function LoginPage() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        toast.success('Connexion réussie');
-        router.push('/dashboard');
-        router.refresh();
+      if (response.ok && data.success) {
+        if (data.user.isAdmin) {
+          toast.success('Connexion réussie');
+          // Redirection forcée
+          document.location.replace('/dashboard');
+        } else {
+          toast.error('Accès non autorisé');
+        }
       } else {
         toast.error(data.message || 'Erreur de connexion');
       }
     } catch (error) {
-      toast.error(error.message || 'Erreur de connexion', {
-        icon: '🚫',
-        style: { background: '#1E293B', color: 'white' }
-      });
+      console.error('Erreur:', error);
+      toast.error('Erreur de connexion');
       resetForm();
     } finally {
       setSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -249,6 +252,7 @@ export default function LoginPage() {
           </Formik>
         </motion.div>
       </motion.div>
+      <ToastContainer />
     </div>
   );
 } 

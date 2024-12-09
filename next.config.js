@@ -39,7 +39,13 @@ const nextConfig = {
         permanent: true,
       },
     ]
-  }
+  },
+  webpack: (config, { dev, isServer }) => {
+    if (!dev) {
+      config.devtool = false;
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig

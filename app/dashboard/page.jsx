@@ -68,26 +68,28 @@ export default function Dashboard() {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const checkAuth = async () => {
       try {
         const response = await fetch('/api/auth/check-session');
         const data = await response.json();
-        
-        if (!data.isAuthenticated) {
-          router.push('/dashboard/login');
+
+        if (!response.ok || !data.isAuthenticated) {
+          toast.error('Session expirée ou invalide');
+          router.replace('/dashboard/login');
           return;
         }
-        
+
         setIsAuthenticated(true);
       } catch (error) {
-        console.error('Erreur de vérification de session:', error);
-        router.push('/dashboard/login');
+        console.error('Erreur de vérification:', error);
+        toast.error('Erreur de vérification de session');
+        router.replace('/dashboard/login');
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkSession();
+    checkAuth();
   }, [router]);
 
   const handleLogout = async () => {
@@ -100,16 +102,12 @@ export default function Dashboard() {
     }
   };
 
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full"
-        />
-      </div>
-    );
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   const menuItems = [

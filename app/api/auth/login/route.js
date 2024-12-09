@@ -1,35 +1,59 @@
 import { NextResponse } from 'next/server';
-import { createToken } from '@/utils/jwt';
+import { createToken } from '@/utils/edge-jwt';
 import { cookies } from 'next/headers';
+import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request) {
   try {
     const body = await request.json();
     const { email, password } = body;
 
-    // Vérifier les credentials admin
-    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+    console.log('Tentative de connexion:', email);
+
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!user || !await bcrypt.compare(password, user.password)) {
+      console.log('Authentification échouée');
       return NextResponse.json(
         { success: false, message: 'Identifiants invalides' },
         { status: 401 }
       );
     }
 
-    // Créer le token JWT
-    const token = createToken({ email, isAdmin: true });
+    console.log('Utilisateur trouvé:', user);
 
-    // Créer la réponse avec le cookie
-    const response = NextResponse.json(
-      { success: true, message: 'Connexion réussie' },
-      { status: 200 }
-    );
+    // Créer le token JWT avec toutes les informations nécessaires
+    const token = await createToken({
+      userId: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin
+    });
+
+    if (!token) {
+      throw new Error('Erreur de création du token');
+    }
+
+    console.log('Token créé');
+
+    const response = NextResponse.json({
+      success: true,
+      message: 'Connexion réussie',
+      user: {
+        id: user.id,
+        email: user.email,
+        isAdmin: user.isAdmin
+      }
+    });
 
     // Définir le cookie avec le token
     response.cookies.set('admin_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000, // 24 heures
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
       path: '/'
     });
 
