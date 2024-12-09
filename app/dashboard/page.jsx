@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiHome, FiUsers, FiMail, FiLogOut, FiBriefcase, FiFileText, FiActivity, FiClock, FiGithub, FiArrowUp, FiEye, FiStar, FiMessageCircle, FiCalendar } from 'react-icons/fi';
+import { FiHome, FiUsers, FiMail, FiLogOut, FiBriefcase, FiFileText, FiActivity, FiClock, FiGithub, FiArrowUp, FiEye, FiStar, FiMessageCircle, FiCalendar, FiSettings } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import ProjectsManager from '../components/dashboard/ProjectsManager';
 import AppointmentsManager from '../components/dashboard/AppointmentsManager';
 import { useRouter } from 'next/navigation';
 import Overview from '../components/dashboard/Overview';
+import SettingsManager from '../components/dashboard/SettingsManager';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -117,6 +118,11 @@ export default function Dashboard() {
     { icon: FiMail, label: 'Rendez-vous', id: 'appointments' },
     { icon: FiFileText, label: 'Blog', id: 'blog' },
     { icon: FiUsers, label: 'Chatbot', id: 'chatbot' },
+    {
+      id: 'settings',
+      label: 'Paramètres',
+      icon: FiSettings
+    }
   ];
 
   const stats = [
@@ -256,7 +262,9 @@ export default function Dashboard() {
             <AppointmentsManager />
           )}
 
-          {/* Ajoutez d'autres conditions pour les autres onglets */}
+          {activeTab === 'settings' && (
+            <SettingsManager />
+          )}
         </div>
       </div>
     </div>
